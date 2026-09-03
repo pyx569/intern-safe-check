@@ -35,7 +35,7 @@
         .pop-panel{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:99;}
         .pop-box{background:#fff;width:90%;max-width:500px;padding:24px;border-radius:14px;}
         .pop-box h3{margin-bottom:12px;color:#2c3e50;}
-        .pop-box textarea{margin:8px 0;min-height:100px;}
+        .pop-box textarea{margin:8px 0;min-height:100px;width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;}
         .pop-btn{display:flex;gap:10px;margin-top:15px;justify-content:flex-end;}
         .hidden{display:none !important;}
         #imgFile{display:none;}
@@ -70,7 +70,6 @@
     </div>
 </div>
 
-<!--弹窗编辑卡片-->
 <div class="pop-panel" id="editModal">
     <div class="pop-box">
         <h3 id="modalTitle"></h3>
@@ -84,50 +83,68 @@
 
 <div id="pdfDom" style="display:none;padding:20px;"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-// 存储卡片数据
 let cardData = JSON.parse(localStorage.getItem("contractCard")) || {
     c01:"",c02:"",c03:"",c04:"",c05:"",c06:"",c07:"",c08:"",c09:"",c10:""
 };
 let editKey = "";
 
-//风险规则 + 否定词库
 const riskRule = [
-    {id:"H01",words:["押金","培训费","服装费","体检费","建档费","保证金"],deny:["不收取","无需","免除","无","不收"]},
+    {
+        id:"H01",
+        words:["押金","培训费","服装费","体检费","建档费","保证金"],
+        deny:["不收取","不收","无需","免除","无","不会收取"]
+    },
     {id:"H02",words:["刷单","垫付","转账","充值"],deny:[]},
     {id:"H03",words:["日赚几百","高额佣金","轻松赚钱"],deny:[]}
 ];
+
 const cardMeta = [
-    {key:"c01",title:"C01 用人主体",tip:"单位全称 + 官方核验渠道"},
-    {key:"c02",title:"C02 岗位职责",tip:"岗位名称 + 主要任务"},
-    {key:"c03",title:"C03 工作地点",tip:"具体地址 / 远程安排"},
-    {key:"c04",title:"C04 实习期限",tip:"开始 — 结束日期"},
-    {key:"c05",title:"C05 出勤工时",tip:"每周天数 × 每日小时"},
-    {key:"c06",title:"C06 报酬标准",tip:"金额 + 计量单位"},
-    {key:"c07",title:"C07 结算安排",tip:"周期 + 支付方式 / 主体"},
-    {key:"c08",title:"C08 带教考核",tip:"带教人/部门/反馈/考核"},
-    {key:"c09",title:"C09 安全保障",tip:"培训/防护/保险/联系人"},
-    {key:"c10",title:"C10 退出与证明",tip:"退出/结算/证明条件"}
+    {key:"c01",title:"用人主体",tip:"单位全称 + 官方核验渠道"},
+    {key:"c02",title:"岗位职责",tip:"岗位名称 + 主要任务"},
+    {key:"c03",title:"工作地点",tip:"具体地址 / 远程安排"},
+    {key:"c04",title:"实习期限",tip:"开始 — 结束日期"},
+    {key:"c05",title:"出勤工时",tip:"每周天数 × 每日小时"},
+    {key:"c06",title:"报酬标准",tip:"金额 + 计量单位"},
+    {key:"c07",title:"结算安排",tip:"周期 + 支付方式 / 主体"},
+    {key:"c08",title:"带教考核",tip:"带教人/部门/反馈/考核"},
+    {key:"c09",title:"安全保障",tip:"培训/防护/保险/联系人"},
+    {key:"c10",title:"退出与证明",tip:"退出/结算/证明条件"}
 ];
 
-//解析文本自动填充卡片
 function parseAutoFill(text){
-    cardData.c01 = text.match(/单位[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c02 = text.match(/岗位[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c03 = text.match(/地点[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c04 = text.match(/周期[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c05 = text.match(/时间[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c06 = text.match(/补贴[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c07 = text.match(/结算[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c08 = text.match(/带教[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c09 = text.match(/保障[:：](.*?)[\n，。]/)?.[1] || "";
-    cardData.c10 = text.match(/退出[:：](.*?)[\n，。]/)?.[1] || "";
+    let newFill = {};
+    let companyMatch = text.match(/([^，。；]*?(有限公司|文化传媒|科技公司|实业集团))/);
+    newFill.c01 = companyMatch ? companyMatch[1].trim() : "";
+
+    let jobMatch = text.match(/([^，。；]*?(实习生|助理|文员))/);
+    newFill.c02 = jobMatch ? jobMatch[1].trim() : "";
+
+    let addrMatch = text.match(/(.+市.+区.*?(大厦|园区|街道|写字楼))/);
+    newFill.c03 = addrMatch ? addrMatch[1].trim() : "";
+
+    let dateMatch = text.match(/(\d{4}-\d{1,2}-\d{1,2}).*?(\d{4}-\d{1,2}-\d{1,2})/);
+    newFill.c04 = dateMatch ? `${dateMatch[1]} 至 ${dateMatch[2]}` : "";
+
+    let workTime = text.match(/周一至周五.*?(\d{1,2}[:：]\d{2}).*?(\d{1,2}[:：]\d{2})/);
+    newFill.c05 = workTime ? `周一至周五 ${workTime[1]}-${workTime[2]}` : "";
+
+    let salaryMatch = text.match(/(\d+)元\/天/);
+    newFill.c06 = salaryMatch ? `${salaryMatch[1]}元/天实习补贴` : "";
+
+    newFill.c07 = text.includes("按月") || text.includes("月结") ? "按月对公转账发放" : "";
+    newFill.c08 = text.includes("带教老师") ? "配备专职带教老师，实习结束出具评价" : "";
+    newFill.c09 = text.includes("意外险") || text.includes("保险") ? "公司提供办公意外险，配备紧急联系人" : "";
+    newFill.c10 = text.includes("实习证明") ? "实习考核合格，可开具实习证明" : "";
+
+    for(let k in newFill){
+        if(!cardData[k]){
+            cardData[k] = newFill[k];
+        }
+    }
     localStorage.setItem("contractCard",JSON.stringify(cardData));
-    renderCard();
 }
 
-//渲染10张卡片
 function renderCard(){
     let html = "";
     cardMeta.forEach(item=>{
@@ -135,25 +152,28 @@ function renderCard(){
         let showText = val || "<span class='card-empty'>⚠ 待点击补全信息</span>";
         html += `<div class='contract-card' onclick='openEdit("${item.key}","${item.title}")'>
             <div class='card-title'>${item.title}</div>
-            <div class='card-desc'>${showText || item.tip}</div>
+            <div class='card-desc'>${showText}</div>
         </div>`;
     })
     document.getElementById("contractWrap").innerHTML = html;
     checkUnlock();
 }
 
-//判断是否解锁工作台按钮
-function checkUnlock(){
-    let full = Object.values(cardData).every(v=>v.trim()!="");
-    let noRisk = document.getElementById("warnBox").innerHTML.indexOf("danger-tip") === -1;
-    if(full && noRisk){
-        document.getElementById("enterWorkBtn").classList.remove("hidden");
-    }else{
-        document.getElementById("enterWorkBtn").classList.add("hidden");
-    }
+function checkNearDeny(fullText,hitWord,denyList){
+    let pos = fullText.indexOf(hitWord);
+    let start = Math.max(0,pos - 30);
+    let end = Math.min(fullText.length,pos + 30);
+    let sliceText = fullText.slice(start,end);
+    return denyList.some(word => sliceText.includes(word));
 }
 
-//风险检测逻辑（支持否定词过滤误判）
+function checkUnlock(){
+    const allFilled = Object.values(cardData).some(v=>v.trim()!=='');
+    const btn = document.getElementById("enterWorkBtn");
+    if(allFilled) btn.classList.remove("hidden");
+    else btn.classList.add("hidden");
+}
+
 function checkRisk(){
     let text = document.getElementById("jobText").value;
     parseAutoFill(text);
@@ -162,8 +182,8 @@ function checkRisk(){
     riskRule.forEach(rule=>{
         let hitWord = rule.words.find(w=>text.includes(w));
         if(hitWord){
-            const hasDeny = rule.deny.some(d=>text.includes(d));
-            if(!hasDeny){
+            const hasNearDeny = checkNearDeny(text,hitWord,rule.deny);
+            if(!hasNearDeny){
                 warnHtml = `<div class='danger-tip'>● 检测到实习高危风险，请谨慎对待</div>`;
                 riskHtml += `<div class='risk-item'><b>${rule.id}</b>｜存在收费类高危风险<br>正规实习不得提前收取费用<br>建议：拒绝缴费，核实企业资质</div>`;
             }
@@ -174,7 +194,6 @@ function checkRisk(){
     renderCard();
 }
 
-//OCR识图
 document.getElementById("imgFile").onchange = async function(e){
     const file = e.target.files[0];
     if(!file)return;
@@ -183,7 +202,6 @@ document.getElementById("imgFile").onchange = async function(e){
     document.getElementById("jobText").value = res.data.text;
 }
 
-//弹窗编辑
 function openEdit(key,title){
     editKey = key;
     document.getElementById("modalTitle").innerText = title;
@@ -200,7 +218,6 @@ function saveCard(){
     renderCard();
 }
 
-//导出PDF报告
 function exportPdf(){
     let dom = document.getElementById("pdfDom");
     dom.innerHTML = `<h2>实习岗位风险评估报告</h2><div>${document.getElementById("warnBox").innerHTML}</div>`;
