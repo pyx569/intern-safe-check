@@ -25,7 +25,10 @@
         .btn-purple{background:#9b59b6;}
         .btn-yellow{background:#f1c40f;color:#222;margin:20px auto;display:block;padding:12px 24px;font-weight:bold;}
         .danger-tip{background:#ffe9e9;color:#c0392b;border:2px solid #ec7063;padding:14px;border-radius:10px;margin-bottom:20px;text-align:center;font-weight:bold;}
-        .risk-item{background:#fef0f0;border-left:5px solid #e74c3c;padding:14px;border-radius:8px;margin-bottom:12px;}
+        .risk-item{background:#fef0f0;border-left:5px solid #e74c3c;padding:16px;border-radius:8px;margin-bottom:12px;}
+        .risk-title{font-weight:bold;font-size:16px;margin-bottom:6px;color:#c0392b;}
+        .risk-desc{font-size:14px;color:#444;margin-bottom:6px;line-height:1.6;}
+        .risk-suggest{font-size:14px;color:#2980b9;line-height:1.6;}
         .grid-card{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:20px;}
         .contract-card{background:#fff9ef;border:1px solid #f8d7b9;padding:14px;border-radius:10px;cursor:pointer;transition:0.2s;}
         .contract-card:hover{box-shadow:0 2px 8px #00000015;}
@@ -47,11 +50,11 @@
     <div class="home-card-wrap">
         <div class="home-card" onclick="showInternPanel()">
             <h3>实习风险评估</h3>
-            <p>岗位风险检测、实习工作台</p >
+            <p>岗位风险检测、实习工作台</p>
         </div>
         <div class="home-card" onclick="alert('该功能正在开发中，敬请期待！')">
             <h3>线上兼职</h3>
-            <p>功能开发中</p >
+            <p>功能开发中</p>
         </div>
     </div>
 
@@ -89,14 +92,144 @@ let cardData = JSON.parse(localStorage.getItem("contractCard")) || {
 };
 let editKey = "";
 
+// === 完整导入H01-H17全部17条风控规则（与表格一一对应） ===
 const riskRule = [
     {
-        id:"H01",
-        words:["押金","培训费","服装费","体检费","建档费","保证金"],
-        deny:["不收取","不收","无需","免除","无","不会收取"]
+        ruleId:"H01",
+        words:["押金","保证金","培训费","服装费","体检费","建档费"],
+        deny:["不收取","不收","无需","免除","无","不会收取"],
+        title:"发现入职前收费要求",
+        desc:"正规招聘一般不应以报名、入职、保密、服装、体检、押金或培训等名义先向求职者收钱。",
+        action:"暂停付款；索要收费主体、项目、金额、合同与发票；通过学校就业部门或单位官方渠道交叉核验。"
     },
-    {id:"H02",words:["刷单","垫付","转账","充值"],deny:[]},
-    {id:"H03",words:["日赚几百","高额佣金","轻松赚钱"],deny:[]}
+    {
+        ruleId:"H02",
+        words:["培训贷","购车贷","分期购买","贷款上班","设备分期"],
+        deny:[],
+        title:"发现贷款或指定购买要求",
+        desc:"把工作机会与贷款、培训分期、购车、租车、设备或指定商品绑定，可能让求职者先承担债务或成本。",
+        action:"不要签贷款或分期；核验合同相对方、总成本与退出条件；向学校或金融机构官方客服求证。"
+    },
+    {
+        ruleId:"H03",
+        words:["私人转账","个人账户收款","微信转账","支付宝转账","个人银行卡收款"],
+        deny:[],
+        title:"发现向个人账户转账要求",
+        desc:"以入职、保证金、任务垫资等理由要求向个人银行卡、私人微信或支付宝转账，资金追溯和退款风险较高。",
+        action:"立即停止转账；保存聊天、账户、收款码与理由；通过单位官网公开电话核验。"
+    },
+    {
+        ruleId:"H04",
+        words:["陌生APP","屏幕共享","远程控制","远程桌面"],
+        deny:[],
+        title:"发现远程控制或陌生应用要求",
+        desc:"陌生App、屏幕共享和远程控制可能暴露验证码、支付信息、身份资料或设备控制权。",
+        action:"不要继续安装或授权；关闭屏幕共享和远程控制；仅通过官方应用商店与单位官方渠道核验。"
+    },
+    {
+        ruleId:"H05",
+        words:["索要银行卡","支付账户","电话卡","验证码","网银工具"],
+        deny:[],
+        title:"发现敏感账户或凭证要求",
+        desc:"银行卡、支付账户、电话卡、验证码、网银工具等可被用于资金转移或身份冒用，不应交由招聘方控制。",
+        action:"拒绝提供或出借；如已提供，立即联系银行/平台冻结或修改安全设置，并保留证据。"
+    },
+    {
+        ruleId:"H06",
+        words:["刷单","垫付资金","代收代付","跑分","不明转账"],
+        deny:[],
+        title:"发现资金或账户类可疑任务",
+        desc:"刷单、先垫资、代收代付、帮助转账或跑分并非正常实习任务，可能造成财产与法律风险。",
+        action:"停止操作和资金往来；保留任务说明与聊天记录；必要时联系学校、平台或公安机关咨询。"
+    },
+    {
+        ruleId:"H07",
+        words:["联系人不一致","虚假招聘","冒充公司","非官方联系方式"],
+        deny:[],
+        title:"发现招聘身份不一致",
+        desc:"招聘联系人、邮箱、电话、收款主体或面试地点与单位官网/官方电话核验结果不一致，存在冒名或信息失真的可能。",
+        action:"暂停提交材料和赴约；使用单位官网公开电话、学校就业平台、国家企业信用信息公示系统等独立渠道核验。"
+    },
+    {
+        ruleId:"H08",
+        words:["扣押身份证","扣留学生证","留存毕业证","保管证件原件"],
+        deny:[],
+        title:"发现扣留证件原件要求",
+        desc:"要求长期扣留身份证、学生证、毕业证等原件是重要警示，可能引发身份冒用或行动受限。",
+        action:"拒绝交付原件；确需核验时建议现场出示并注明复印件用途；向学校或单位官方渠道核实。"
+    },
+    {
+        ruleId:"H09",
+        words:["人脸识别","指纹采集","手持身份证照片","人脸核验"],
+        deny:[],
+        title:"发现敏感生物信息收集要求",
+        desc:"要求提供人脸识别、指纹、手持身份证照片等，超出普通招聘核验需要，可能被用于身份冒用、贷款或其他非法用途。",
+        action:"拒绝提供；如已提供，立即联系学校、平台或公安机关咨询，并保留要求截图。"
+    },
+    {
+        ruleId:"H10",
+        words:["空白文件","自愿放弃报酬","放弃实习证明","高额违约金","空白协议"],
+        deny:[],
+        title:"发现不公平签署要求",
+        desc:"要求签署空白文件、自愿放弃报酬或实习证明，或设置明显不合理的违约金、竞业限制，可能限制你的基本权利。",
+        action:"不签空白或不合理文件；要求提供完整文本并保留副本；向学校就业部门或法律咨询渠道求助。"
+    },
+    {
+        ruleId:"H11",
+        words:["社交账号密码","微信密码","QQ密码","微博密码","读取通讯录","读取相册","授权通讯录","授权相册"],
+        deny:[],
+        title:"发现社交账号控制要求",
+        desc:"要求提供微信、QQ、微博等社交账号密码，或授权读取通讯录、相册，可能导致隐私泄露或被用于诈骗。",
+        action:"拒绝提供；修改相关账号安全设置；保留要求记录。"
+    },
+    {
+        ruleId:"H12",
+        words:["退出收费","离职收费","违约金","押金","培训成本","缴纳费用才能退出","缴纳费用才能离职"],
+        deny:[],
+        title:"发现退出收费要求",
+        desc:"以“违约金”“押金”“培训成本”等名义，要求你先缴纳费用才能退出或离职，属于不合理收费。",
+        action:"拒绝支付；保留聊天记录；向学校就业中心或劳动监察部门咨询。"
+    },
+    {
+        ruleId:"H13",
+        words:["岗位不符","实际工作不符","挂羊头卖狗肉","招转培","培训上岗","先培训后上岗"],
+        deny:[],
+        title:"岗位描述与实际不符",
+        desc:"入职后实际工作内容、地点或薪酬与招聘时的承诺有明显差异，或要求先参加付费培训才能上岗，属于典型的“挂羊头卖狗肉”或“招转培”套路。",
+        action:"暂停入职；要求招聘方提供书面岗位说明并加盖公章；通过已入职员工或社交平台核实实际工作内容；向学校就业部门反馈。"
+    },
+    {
+        ruleId:"H14",
+        words:["霸王条款","竞业限制","高额违约金","无限期服务绑定","单方面解除权","不公平条款"],
+        deny:[],
+        title:"发现协议含霸王条款",
+        desc:"实习协议中包含过度宽泛的竞业限制、高额违约金、无限期服务绑定或单方面解除权等不公平条款，可能严重损害实习生合法权益。",
+        action:"暂停签署；逐条阅读协议条款并拍照留存；咨询学校法律顾问或就业指导中心；必要时拒绝签署。"
+    },
+    {
+        ruleId:"H15",
+        words:["名额有限","今天必须决定","赶紧决定","保密","不能告诉别人","紧迫","施压"],
+        deny:[],
+        title:"发现社交工程施压迹象",
+        desc:"沟通中感受到紧迫感施压（如“名额有限”“今天必须决定”）、被要求保密或隔离外界联系，属于常见的社交工程操控手段，旨在阻断理性思考。",
+        action:"暂停决策；告知家人或朋友面试情况；要求书面材料并在冷静后评估；必要时终止接触。"
+    },
+    {
+        ruleId:"H16",
+        words:["付费盖章","代开发票","保证通过学校审核","付费实习证明","购买实习证明"],
+        deny:[],
+        title:"发现付费获取实习证明要求",
+        desc:"招聘方以“付费盖章”“代开发票”“保证通过学校审核”等名义提供实习证明或学分认证服务，可能涉及虚假实习、伪造公章等违法行为。",
+        action:"拒绝付费获取实习证明；通过学校官方渠道确认实习认定流程；如发现伪造公章迹象，向学校保卫部门报告。"
+    },
+    {
+        ruleId:"H17",
+        words:["AI面试","虚拟面试","视频合成面试","声音克隆","深伪面试","纯视频面试","纯语音面试"],
+        deny:[],
+        title:"发现疑似AI伪造面试诈骗迹象",
+        desc:"面试为纯视频/语音且无法通过官方公开电话二次核验，或发现面试官为视频合成、声音克隆，属于利用AI技术实施的新型诈骗手段，用于获取面试者面部、声音以及其他个人信息。",
+        action:"暂停提交任何个人信息；通过单位官方公开电话（非招聘方提供的号码）进行人工核验；向学校或公安机关报告。"
+    }
 ];
 
 const cardMeta = [
@@ -179,38 +312,41 @@ function checkRisk(){
     parseAutoFill(text);
     let warnHtml = "";
     let riskHtml = "";
+    let hitCount = 0;
     riskRule.forEach(rule=>{
         let hitWord = rule.words.find(w=>text.includes(w));
         if(hitWord){
             const hasNearDeny = checkNearDeny(text,hitWord,rule.deny);
             if(!hasNearDeny){
-                warnHtml = `<div class='danger-tip'>● 检测到实习高危风险，请谨慎对待</div>`;
-                riskHtml += `<div class='risk-item'><b>${rule.id}</b>｜存在收费类高危风险<br>正规实习不得提前收取费用<br>建议：拒绝缴费，核实企业资质</div>`;
+                hitCount++;
+                warnHtml = `<div class='danger-tip'>● 检测到${hitCount}条实习高危风险，请谨慎对待</div>`;
+                riskHtml += `<div class='risk-item'>
+                    <div class='risk-title'>${rule.ruleId}｜${rule.title}</div>
+                    <div class='risk-desc'>${rule.desc}</div>
+                    <div class='risk-suggest'>💡建议动作：${rule.action}</div>
+                </div>`;
             }
         }
     })
+    if(hitCount === 0){
+        warnHtml = `<div class='danger-tip' style='background:#e8f5e9;color:#2e7d32;border-color:#66bb6a;'>✅ 未检测到高危风险，仍建议仔细核对岗位细节</div>`;
+    }
     document.getElementById("warnBox").innerHTML = warnHtml;
     document.getElementById("riskList").innerHTML = riskHtml;
     renderCard();
 }
 
-document.getElementById("imgFile").onchange = async function(e){
-    const file = e.target.files[0];
-    if(!file)return;
-    alert("识别中，请稍候...");
-    const res = await Tesseract.recognize(file,"chi_sim");
-    document.getElementById("jobText").value = res.data.text;
-}
-
 function openEdit(key,title){
     editKey = key;
-    document.getElementById("modalTitle").innerText = title;
-    document.getElementById("modalInput").value = cardData[key];
+    document.getElementById("modalTitle").textContent = `编辑${title}`;
+    document.getElementById("modalInput").value = cardData[key] || "";
     document.getElementById("editModal").style.display = "flex";
 }
+
 function closeModal(){
     document.getElementById("editModal").style.display = "none";
 }
+
 function saveCard(){
     cardData[editKey] = document.getElementById("modalInput").value.trim();
     localStorage.setItem("contractCard",JSON.stringify(cardData));
@@ -218,15 +354,58 @@ function saveCard(){
     renderCard();
 }
 
-function exportPdf(){
-    let dom = document.getElementById("pdfDom");
-    dom.innerHTML = `<h2>实习岗位风险评估报告</h2><div>${document.getElementById("warnBox").innerHTML}</div>`;
-    html2pdf().set({margin:12}).from(dom).save("实习风险报告.pdf");
-}
 function showInternPanel(){
     document.getElementById("internPanel").style.display = "block";
-    renderCard();
 }
+
+// 截图OCR识别
+document.getElementById('imgFile').addEventListener('change', async function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    alert('正在识别图片文字，请稍候...');
+    const worker = await Tesseract.createWorker('chi_sim', 1);
+    const ret = await worker.recognize(file);
+    document.getElementById('jobText').value = ret.data.text;
+    await worker.terminate();
+    alert('文字识别完成！');
+});
+
+// PDF导出功能
+function exportPdf(){
+    const text = document.getElementById("jobText").value;
+    if(!text){
+        alert("请先粘贴岗位描述并生成评估");
+        return;
+    }
+    // 填充PDF内容
+    let pdfContent = `<h1>实习风险评估报告</h1>`;
+    pdfContent += `<h3>岗位原始描述</h3><p>${text.replace(/\n/g,'<br>')}</p>`;
+    pdfContent += `<h3>风险检测结果</h3>`;
+    const riskItems = document.querySelectorAll('.risk-item');
+    if(riskItems.length === 0){
+        pdfContent += `<p>✅ 未检测到高危风险</p>`;
+    } else {
+        riskItems.forEach(item=>{
+            pdfContent += item.innerHTML;
+        });
+    }
+    pdfContent += `<h3>实习核心信息卡片</h3>`;
+    cardMeta.forEach(item=>{
+        pdfContent += `<p><strong>${item.title}：</strong>${cardData[item.key] || '未填写'}</p>`;
+    });
+    
+    document.getElementById('pdfDom').innerHTML = pdfContent;
+    const element = document.getElementById('pdfDom');
+    html2pdf().set({
+        margin: 10,
+        filename: '实习风险评估报告.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(element).save();
+}
+
+// 初始化渲染
 renderCard();
 </script>
 </body>
