@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实习工作台（学生自用）</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
+        body{background:#f5f7fa;padding:24px 16px;max-width:1000px;margin:0 auto;}
+        .container{background:#fff;padding:28px;border-radius:16px;box-shadow:0 4px 16px #00000012;}
+        h1{text-align:center;color:#2c3e50;margin-bottom:30px;font-size:24px;}
+        .grid-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:30px;}
+        .func-card{padding:22px;background:#f0f4f8;border-radius:12px;text-align:center;cursor:pointer;transition:0.2s;}
+        .func-card:hover{background:#e1eaf3;transform:translateY(-3px);}
+        .func-name{font-size:16px;font-weight:bold;color:#2c3e50;margin-bottom:6px;}
+        .panel{display:none;margin-top:20px;padding:20px;background:#f8f9fa;border-radius:12px;}
+        textarea{width:100%;min-height:120px;padding:12px;border:1px solid #dde2e8;border-radius:8px;font-size:15px;resize:vertical;margin:10px 0;}
+        input{width:100%;padding:12px;border:1px solid #dde2e8;border-radius:8px;font-size:15px;margin:10px 0;}
+        .btn-row{display:flex;gap:12px;margin-top:15px;flex-wrap:wrap;}
+        button{padding:10px 18px;border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
+        .save{background:#27ae60;}
+        .export{background:#3488eb;}
+        .back{background:#95a5a6;}
+        .record-item{padding:10px;background:#fff;border:1px solid #eee;border-radius:8px;margin:8px 0;}
+        #pdfWrap{padding:20px;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>实习工作台（学生自用）</h1>
+    <div class="grid-box">
+        <div class="func-card" onclick="showPanel('clock')">
+            <div class="func-name">上下班打卡记录</div>
+        </div>
+        <div class="func-card" onclick="showPanel('log')">
+            <div class="func-name">实习日志撰写</div>
+        </div>
+        <div class="func-card" onclick="showPanel('report')">
+            <div class="func-name">周报/月报存档</div>
+        </div>
+        <div class="func-card" onclick="showPanel('task')">
+            <div class="func-name">个人任务进度记录</div>
+        </div>
+        <div class="func-card" onclick="showPanel('feeling')">
+            <div class="func-name">实习感悟与评价</div>
+        </div>
+    </div>
+
+    <!--打卡面板-->
+    <div id="clock" class="panel">
+        <h3>上下班打卡记录</h3>
+        <input id="clockText" placeholder="填写打卡时间，例：2026-09-03 09:00上班 / 18:00下班">
+        <div class="btn-row">
+            <button class="save" onclick="saveData('clock')">保存记录</button>
+            <button class="back" onclick="hideAll()">关闭</button>
+        </div>
+        <div id="clockList"></div>
+    </div>
+    <!--日志面板-->
+    <div id="log" class="panel">
+        <h3>实习日志撰写</h3>
+        <textarea id="logText" placeholder="记录今日实习内容与收获"></textarea>
+        <div class="btn-row">
+            <button class="save" onclick="saveData('log')">保存日志</button>
+            <button class="back" onclick="hideAll()">关闭</button>
+        </div>
+        <div id="logList"></div>
+    </div>
+    <!--周报月报-->
+    <div id="report" class="panel">
+        <h3>周报/月报存档</h3>
+        <textarea id="reportText" placeholder="填写周期工作总结"></textarea>
+        <div class="btn-row">
+            <button class="save" onclick="saveData('report')">保存文档</button>
+            <button class="back" onclick="hideAll()">关闭</button>
+        </div>
+        <div id="reportList"></div>
+    </div>
+    <!--任务进度-->
+    <div id="task" class="panel">
+        <h3>个人任务进度记录</h3>
+        <textarea id="taskText" placeholder="记录负责任务与完成情况"></textarea>
+        <div class="btn-row">
+            <button class="save" onclick="saveData('task')">保存任务</button>
+            <button class="back" onclick="hideAll()">关闭</button>
+        </div>
+        <div id="taskList"></div>
+    </div>
+    <!--感悟评价-->
+    <div id="feeling" class="panel">
+        <h3>实习感悟与评价</h3>
+        <textarea id="feelingText" placeholder="写下个人实习心得"></textarea>
+        <div class="btn-row">
+            <button class="save" onclick="saveData('feeling')">保存感悟</button>
+            <button class="back" onclick="hideAll()">关闭</button>
+        </div>
+        <div id="feelingList"></div>
+    </div>
+
+    <div class="btn-row" style="justify-content:center;margin-top:20px;">
+        <button class="export" onclick="exportAllPdf()">导出全部记录PDF</button>
+    </div>
+    <button class="back" style="margin-top:20px;" onclick="window.location.href='index.html'">返回风险评估首页</button>
+</div>
+
+<div id="pdfWrap" style="display:none;"></div>
+
+<script>
+let store = JSON.parse(localStorage.getItem("internRecord")) || {
+    clock:[],log:[],report:[],task:[],feeling:[]
+};
+
+function hideAll(){
+    document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
+}
+function showPanel(key){
+    hideAll();
+    document.getElementById(key).style.display="block";
+    renderList(key);
+}
+function saveData(key){
+    let val = document.getElementById(key+"Text").value.trim();
+    if(!val)return alert("内容不能为空");
+    store[key].push({time:new Date().toLocaleString(),content:val});
+    localStorage.setItem("internRecord",JSON.stringify(store));
+    document.getElementById(key+"Text").value="";
+    renderList(key);
+    alert("保存成功");
+}
+function renderList(key){
+    let html = "";
+    store[key].forEach(item=>{
+        html += `<div class="record-item"><div>${item.time}</div><div>${item.content}</div></div>`;
+    })
+    document.getElementById(key+"List").innerHTML = html;
+}
+
+function exportAllPdf(){
+    let pdfDom = document.getElementById("pdfWrap");
+    let content = `<h2>实习个人完整存档记录</h2>`;
+    content += `<h4>打卡记录</h4>`;
+    store.clock.forEach(i=>content+=`<p>${i.time}：${i.content}</p >`);
+    content += `<h4>实习日志</h4>`;
+    store.log.forEach(i=>content+=`<p>${i.time}：${i.content}</p >`);
+    content += `<h4>周报月报</h4>`;
+    store.report.forEach(i=>content+=`<p>${i.time}：${i.content}</p >`);
+    content += `<h4>任务进度</h4>`;
+    store.task.forEach(i=>content+=`<p>${i.time}：${i.content}</p >`);
+    content += `<h4>实习感悟</h4>`;
+    store.feeling.forEach(i=>content+=`<p>${i.time}：${i.content}</p >`);
+    pdfDom.innerHTML = content;
+    html2pdf().set({margin:10}).from(pdfDom).save("实习个人记录.pdf");
+}
+</script>
+</body>
+</html>
