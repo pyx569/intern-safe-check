@@ -89,6 +89,7 @@
             border-radius:8px;
             margin:20px 0;
             white-space: pre‑line;
+            line-height:1.8;
         }
         .red{background:#fff1f0;border:1px solid #ffa39e;}
         .yellow{background:#fffbe6;border:1px solid #ffe58f;}
@@ -308,7 +309,6 @@
 </div>
 
 <script>
-//状态中文映射
 const statusMap = {
     clear:"待填写",
     pending:"待确认",
@@ -316,28 +316,27 @@ const statusMap = {
     na:"不适用"
 };
 
-//风险元数据
+//分级规则 high=红色高危 warn=黄色提醒
 const riskMeta = [
-    {title:"收费/押金要求",danger:true,tip:"收费类实习存在诈骗风险，正规实习不得向学生收取任何费用",suggest:"拒绝缴纳任何费用，更换实习单位"},
-    {title:"高额提成保底陷阱",danger:true,tip:"薪资完全依靠提成无保底属于高风险模式，谨防口头高薪骗局",suggest:"务必确认书面底薪与薪资构成，拒绝仅口头承诺高薪"},
-    {title:"异地外派风险",danger:true,tip:"无正规办公地点的异地外派存在人身安全隐患",suggest:"核实企业资质、办公地址，谨慎前往异地"},
-    {title:"身份证件扣押",danger:true,tip:"用人单位不允许扣押学生身份证、银行卡原件",suggest:"拒绝上交证件原件，仅可提供复印件并做好签注"},
-    {title:"借贷刷单任务",danger:true,tip:"刷单、垫资转账属于典型电信诈骗模式",suggest:"直接放弃该实习岗位，切勿参与资金操作"},
-    {title:"传销层级计酬",danger:true,tip:"依靠拉人头获取报酬属于传销特征",suggest:"立即放弃该实习，必要时报警"},
-    {title:"空白合同签署",danger:true,tip:"签署空白文件会造成权益完全不受保护",suggest:"拒绝签署任何空白合同与空白文件"},
-    {title:"竞业无限扩大",danger:false,tip:"宽泛无边界竞业协议会限制后续就业",suggest:"协商修改竞业范围、期限与补偿金条款"},
-    {title:"敏感信息采集",danger:false,tip:"无合理理由强制采集人脸声纹等隐私存在泄露风险",suggest:"拒绝非必要敏感信息采集要求"},
-    {title:"空白授权文件",danger:true,tip:"空白授权文件会被随意填写损害学生权益",suggest:"绝不签署空白授权类文件"},
-    {title:"不等责协议责任",danger:false,tip:"只约束学生、不约束企业的高额违约金条款不合理",suggest:"和企业协商修改不对等违约条款"},
-    {title:"无偿加班强制要求",danger:false,tip:"强制无偿加班侵害学生实习权益",suggest:"和HR确认加班补偿方式，留存沟通记录"},
-    {title:"违规高强度夜班",danger:true,tip:"学生/未成年人长期高危夜班存在安全风险",suggest:"拒绝高危夜班岗位"},
-    {title:"单方面变更约定",danger:false,tip:"企业可单方面修改薪资岗位地点会损害实习权益",suggest:"要求将变更限制写入实习协议"},
-    {title:"变相收费扣款",danger:true,tip:"以罚款、扣费变相收费属于违规行为",suggest:"拒绝各类变相扣费规则"},
-    {title:"外包转嫁用工责任",danger:false,tip:"签约主体与实际用工不一致，责任容易互相推诿",suggest:"明确实际用工方、签约方各自权责"},
-    {title:"视频采集核验",danger:false,tip:"强制录制承诺人脸视频存在被滥用风险",suggest:"谨慎录制约束性质的人脸承诺视频"}
+    {title:"收费/押金要求",level:"high",tip:"收费类实习存在诈骗风险，正规实习不得向学生收取任何费用",suggest:"拒绝缴纳任何费用，更换实习单位"},
+    {title:"高额提成保底陷阱",level:"high",tip:"薪资完全依靠提成无保底属于高风险模式，谨防口头高薪骗局",suggest:"务必确认书面底薪与薪资构成，拒绝仅口头承诺高薪"},
+    {title:"异地外派风险",level:"high",tip:"无正规办公地点的异地外派存在人身安全隐患",suggest:"核实企业资质、办公地址，谨慎前往异地"},
+    {title:"身份证件扣押",level:"high",tip:"用人单位不允许扣押学生身份证、银行卡原件",suggest:"拒绝上交证件原件，仅可提供复印件并做好签注"},
+    {title:"借贷刷单任务",level:"high",tip:"刷单、垫资转账属于典型电信诈骗模式",suggest:"直接放弃该实习岗位，切勿参与资金操作"},
+    {title:"传销层级计酬",level:"high",tip:"依靠拉人头获取报酬属于传销特征",suggest:"立即放弃该实习，必要时报警"},
+    {title:"空白合同签署",level:"high",tip:"签署空白文件会造成权益完全不受保护",suggest:"拒绝签署任何空白合同与空白文件"},
+    {title:"竞业无限扩大",level:"warn",tip:"宽泛无边界竞业协议会限制后续就业",suggest:"协商修改竞业范围、期限与补偿金条款"},
+    {title:"敏感信息采集",level:"warn",tip:"无合理理由强制采集人脸声纹等隐私存在泄露风险",suggest:"拒绝非必要敏感信息采集要求"},
+    {title:"空白授权文件",level:"high",tip:"空白授权文件会被随意填写损害学生权益",suggest:"绝不签署空白授权类文件"},
+    {title:"不等责协议责任",level:"warn",tip:"只约束学生、不约束企业的高额违约金条款不合理",suggest:"和企业协商修改不对等违约条款"},
+    {title:"无偿加班强制要求",level:"high",tip:"强制无偿加班侵害学生实习权益",suggest:"和HR确认加班补偿方式，留存沟通记录"},
+    {title:"违规高强度夜班",level:"high",tip:"学生/未成年人长期高危夜班存在安全风险",suggest:"拒绝高危夜班岗位"},
+    {title:"单方面变更约定",level:"warn",tip:"企业可单方面修改薪资岗位地点会损害实习权益",suggest:"要求将变更限制写入实习协议"},
+    {title:"变相收费扣款",level:"high",tip:"以罚款、扣费变相收取实习相关费用",suggest:"拒绝各类变相扣费规则"},
+    {title:"外包转嫁用工责任",level:"warn",tip:"签约主体与实际用工不一致，责任容易互相推诿",suggest:"明确实际用工方、签约方各自权责"},
+    {title:"视频采集核验",level:"warn",tip:"强制录制承诺人脸视频存在被滥用风险",suggest:"谨慎录制约束性质的人脸承诺视频"}
 ];
 
-//17项风险
 const hRawList = [
     {title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用"},
     {title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺"},
@@ -358,7 +357,6 @@ const hRawList = [
     {title:"视频采集核验",desc:"要求录制承诺视频、人脸视频作为考核或者约束手段"}
 ];
 
-//20张卡片
 const cRawList = [
     {key:"C01",name:"实习薪资标准",core:true,disableNa:true},
     {key:"C02",name:"薪资发放时间",core:true,disableNa:true},
@@ -529,27 +527,41 @@ document.getElementById("saveEdit").onclick = function(){
     renderCCard();
 };
 
+//新的分级计算逻辑
 function calcRiskResult(){
-    const hitList = [];
+    let highList = [];
+    let warnList = [];
     for(let i=0;i<formData.hRule.length;i++){
         const item = formData.hRule[i];
-        if(item.ans === "y" && riskMeta[i].danger === true){
-            hitList.push({idx:i,title:item.title,tip:riskMeta[i].tip,suggest:riskMeta[i].suggest});
+        if(item.ans === "y"){
+            if(riskMeta[i].level === "high"){
+                highList.push(riskMeta[i]);
+            }else if(riskMeta[i].level === "warn"){
+                warnList.push(riskMeta[i]);
+            }
         }
-    }
-    if(hitList.length>0){
-        let text = "🔴 高风险提示：检测到实习存在高危风险点，请谨慎选择该实习岗位。\n";
-        hitList.forEach(h=>{
-            text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
-        });
-        return {level:"red",text:text,hit:hitList};
     }
     const allUnknown = formData.hRule.every(i=>i.ans === "u");
     if(allUnknown){
-        return {level:"yellow",text:"🟡 待核验提示：全部风险项均为不确定，请完成风险核验后再生成报告。",hit:[]};
-    }else{
-        return {level:"green",text:"🟢 基础风险核验通过，建议完善实习约定卡片，留存书面凭证保护自身权益。",hit:[]};
+        return {level:"yellow",text:"🟡 待核验提示：全部风险项均为不确定，请完成风险核验后再生成报告。"};
     }
+
+    let text = "";
+    if(highList.length>0){
+        text += "🔴【高危风险】\n";
+        highList.forEach(h=>{
+            text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
+        });
+    }
+    if(warnList.length>0){
+        text += "\n🟡【潜在风险提醒】\n";
+        warnList.forEach(w=>{
+            text += `——————————\n【风险项】${w.title}\n【风险说明】${w.tip}\n【行动建议】${w.suggest}\n`;
+        });
+    }
+    if(highList.length>0) return {level:"red",text:text};
+    if(warnList.length>0) return {level:"yellow",text};
+    return {level:"green",text:"🟢 基础风险核验通过，建议完善实习约定卡片，留存书面凭证保护自身权益。"};
 }
 
 document.getElementById("calcResultBtn").onclick = function(){
@@ -601,7 +613,6 @@ document.getElementById("calcResultBtn").onclick = function(){
     document.getElementById("reportArea").classList.remove("report-hidden");
 };
 
-//调用浏览器原生打印（系统弹窗保存PDF）
 document.getElementById("exportPdfBtn").onclick = function(){
     window.print();
 };
@@ -620,7 +631,6 @@ document.getElementById("saveRecordBtn").onclick = function(){
     window.location.href="intern.html";
 };
 
-//OCR识图
 const ocrFile = document.getElementById("ocrFile");
 const ocrBtn = document.getElementById("ocrBtn");
 const ocrTip = document.getElementById("ocrTip");
