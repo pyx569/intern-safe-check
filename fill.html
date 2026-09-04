@@ -5,43 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>快捷录入｜实习有约</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei";}
-        body{padding:40px 20px;}
-        .container{max-width:800px;margin:0 auto;}
-        .box{margin-bottom:16px;}
-        input,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;}
-        .btn{padding:8px 16px;background:#1677ff;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei",sans-serif; }
+        body { padding:40px 30px; max-width:800px; margin:0 auto; background:#f5f7fa; }
+        .header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
+        h1 { font-size:28px; color:#222; }
+        .btn { border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:15px; }
+        .btn-blue { background:#1677ff; color:#fff; }
+        .btn-gray { background:#94a3b8; color:#fff; }
+        .form-card { background:#fff; border-radius:12px; padding:30px; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+        .form-item { margin-bottom:22px; }
+        .form-item label { display:block; font-weight:bold; margin-bottom:8px; color:#333; font-size:15px; }
+        .form-item input, .form-item textarea {
+            width:100%; padding:12px; border:1px solid #d9d9d9; border-radius:8px; font-size:15px;
+        }
+        .form-item textarea { min-height:180px; resize:vertical; }
+        .tip { font-size:13px; color:#888; margin-top:6px; line-height:1.6; }
+        .btn-row { display:flex; gap:12px; margin-top:24px; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>快捷录入岗位信息</h1>
-    <div class="box">
-        <label>企业全称</label>
-        <input id="quickCompany">
+    <div class="header-row">
+        <h1>快捷录入岗位信息</h1>
+        <button class="btn btn-gray" onclick="window.location.href='intern.html'">返回工作台</button>
     </div>
-    <div class="box">
-        <label>实习岗位名称</label>
-        <input id="quickPost">
+    <div class="form-card">
+        <div class="form-item">
+            <label>单位全称</label>
+            <input id="companyName" placeholder="请填写企业完整名称">
+        </div>
+        <div class="form-item">
+            <label>岗位名称</label>
+            <input id="postName" placeholder="请填写实习岗位名称">
+        </div>
+        <div class="form-item">
+            <label>岗位完整描述</label>
+            <textarea id="jobText" placeholder="粘贴招聘信息、岗位描述、薪资待遇、工作内容等完整信息"></textarea>
+            <div class="tip">填写完成后点击「开始风险评估」，系统将自动带入这些信息进入评估流程</div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-blue" onclick="goEvaluate()">开始风险评估</button>
+            <button class="btn btn-gray" onclick="window.location.href='index.html'">直接进入评估页</button>
+        </div>
     </div>
-    <div class="box">
-        <label>岗位完整描述</label>
-        <textarea id="quickText" rows="8"></textarea>
-    </div>
-    <button class="btn" id="goMain">前往风险评估页面填充内容</button>
-    <div style="margin-top:12px;"><a href=" ">返回首页</a ></div>
-</div>
+
 <script>
-document.getElementById("goMain").onclick = function(){
-    const data = {
-        companyName:document.getElementById("quickCompany").value,
-        postName:document.getElementById("quickPost").value,
-        jobText:document.getElementById("quickText").value
+function goEvaluate(){
+    const companyName = document.getElementById("companyName").value.trim();
+    const postName = document.getElementById("postName").value.trim();
+    const jobText = document.getElementById("jobText").value.trim();
+
+    if(!companyName && !postName && !jobText){
+        alert("请至少填写一项岗位信息后再开始评估");
+        return;
     }
-    sessionStorage.setItem("quickFill",JSON.stringify(data));
-    window.location.href="index.html";
+    sessionStorage.setItem("quickFillData", JSON.stringify({companyName,postName,jobText}));
+    window.location.href = "index.html";
 }
-//index.html补充读取sessionStorage回填逻辑，已预留兼容入口
 </script>
 </body>
 </html>
