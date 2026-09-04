@@ -185,18 +185,15 @@
             justify-content:center;
             flex-wrap:wrap;
         }
-        .no-print{
-        }
         @media print{
             .no-print{display:none !important;}
-            .result-block{display:none !important;}
             body{padding:0; background:#fff;}
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header-bar no-print">
+    <div class="header-bar">
         <h1>实习有约｜大学生实习风险体检</h1>
         <div>
             <a href="intern.html"><button class="btn">我的工作台</button></a>
@@ -204,7 +201,7 @@
         </div>
     </div>
 
-    <div class="section no-print">
+    <div class="section">
         <div class="section-title">第一步：填写/识别岗位招聘信息</div>
         <textarea id="jobText" rows="6" placeholder="粘贴岗位描述，或者上传截图自动识别"></textarea>
         <div style="margin:12px 0;">
@@ -227,12 +224,12 @@
         </div>
     </div>
 
-    <div class="section no-print">
+    <div class="section">
         <div class="section-title">第二步：17项实习风险人工核验</div>
         <div id="hList"></div>
     </div>
 
-    <div class="section no-print">
+    <div class="section">
         <div class="section-title">第三步：实习约定信息核验卡片（点击卡片编辑详情）</div>
         <div id="coreCardWrap" class="card-grid"></div>
 
@@ -325,7 +322,6 @@ const statusMap = {
     confirm:"已确认",
     na:"不适用"
 };
-
 //风险元数据，用于输出风险详情
 const riskMeta = [
     {title:"收费/押金要求",danger:true,tip:"收费类实习存在诈骗风险，正规实习不得向学生收取任何费用",suggest:"拒绝缴纳任何费用，更换实习单位"},
@@ -347,7 +343,16 @@ const riskMeta = [
     {title:"视频采集核验",danger:false,tip:"强制录制承诺人脸视频存在被滥用风险",suggest:"谨慎录制约束性质的人脸承诺视频"}
 ];
 
-//完整17项风险题目
+let currentEditKey = "";
+let expandOpened = false;
+let formData = {
+    companyName:"",
+    postName:"",
+    jobText:"",
+    hRule:[],
+    cCard:{}
+};
+
 const hRawList = [
     {title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用"},
     {title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺"},
@@ -368,7 +373,6 @@ const hRawList = [
     {title:"视频采集核验",desc:"要求录制承诺视频、人脸视频作为考核或者约束手段"}
 ];
 
-//完整20张卡片：10核心+10拓展
 const cRawList = [
     {key:"C01",name:"实习薪资标准",core:true,disableNa:true},
     {key:"C02",name:"薪资发放时间",core:true,disableNa:true},
@@ -392,16 +396,6 @@ const cRawList = [
     {key:"C20",name:"违约追责条款",core:false,disableNa:false}
 ];
 
-let currentEditKey = "";
-let expandOpened = false;
-let formData = {
-    companyName:"",
-    postName:"",
-    jobText:"",
-    hRule:[],
-    cCard:{}
-};
-
 function initEmptyCard(){
     return {
         status:"clear",
@@ -414,22 +408,42 @@ function initEmptyCard(){
     }
 }
 
-//重置全部表单按钮
+//【新增：全部重置按钮逻辑】
 document.getElementById("resetAllBtn").onclick = function(){
     if(!confirm("确定要重置全部表单？所有填写内容、风险选项、卡片数据都会恢复默认！")){
         return;
     }
+    //清空输入框
     document.getElementById("companyName").value = "";
     document.getElementById("postName").value = "";
     document.getElementById("jobText").value = "";
     formData.companyName = "";
     formData.postName = "";
     formData.jobText = "";
+    //重置业务数据
     resetAllData();
+    //收回拓展面板
     expandOpened = false;
     document.getElementById("expandPanel").classList.remove("show");
     document.getElementById("toggleExpandBtn").innerText = "展开拓展约定项";
 }
+
+//输入框失去焦点change事件触发重置
+document.getElementById("companyName").addEventListener("change",function(){
+    if(confirm("原核验结果已失效，请重新确认风险项与约定卡片，是否清空全部填写记录？")){
+        resetAllData();
+    }
+});
+document.getElementById("postName").addEventListener("change",function(){
+    if(confirm("原核验结果已失效，请重新确认风险项与约定卡片，是否清空全部填写记录？")){
+        resetAllData();
+    }
+});
+document.getElementById("jobText").addEventListener("change",function(){
+    if(confirm("原核验结果已失效，请重新确认风险项与约定卡片，是否清空全部填写记录？")){
+        resetAllData();
+    }
+});
 
 (function(){
     const quickFill = sessionStorage.getItem("quickFillData");
@@ -462,6 +476,7 @@ document.getElementById("resetAllBtn").onclick = function(){
         renderCCard();
         return;
     }
+
     resetAllData();
 })();
 
@@ -509,6 +524,7 @@ function renderCCard(){
     const expandWrap = document.getElementById("expandCardWrap");
     coreWrap.innerHTML = "";
     expandWrap.innerHTML = "";
+
     cRawList.forEach(cfg=>{
         const cardData = formData.cCard[cfg.key];
         const dom = document.createElement("div");
@@ -554,18 +570,22 @@ function openEditModal(key){
     const cfg = cRawList.find(x=>x.key===key);
     document.getElementById("modalTitle").innerText = "编辑："+cfg.name;
     const d = formData.cCard[key];
+
+    //核心卡片隐藏【不适用】选项
     if(cfg.disableNa){
         naOption.style.display = "none";
         if(d.status === "na") d.status = "clear";
     }else{
         naOption.style.display = "block";
     }
+
     cardStatusSel.value = d.status;
     document.getElementById("cardContent").value = d.content;
     document.getElementById("cardSourceType").value = d.contentType;
     document.getElementById("cardSourceNote").value = d.sourceNote;
     document.getElementById("cardConfirmBy").value = d.confirmBy;
     document.getElementById("cardNaReason").value = d.naReason;
+
     if(cardStatusSel.value === "na" && !cfg.disableNa){
         naReasonWrap.style.display = "block";
     }else{
@@ -576,6 +596,7 @@ function openEditModal(key){
 
 document.getElementById("cancelEdit").onclick = ()=>modal.style.display="none";
 
+//卡片保存校验
 document.getElementById("saveEdit").onclick = function(){
     const cfg = cRawList.find(x=>x.key===currentEditKey);
     const obj = formData.cCard[currentEditKey];
@@ -609,6 +630,7 @@ document.getElementById("saveEdit").onclick = function(){
     renderCCard();
 }
 
+//风险评估计算逻辑
 function calcRiskResult(){
     const hitList = [];
     for(let i=0;i<formData.hRule.length;i++){
@@ -632,11 +654,12 @@ function calcRiskResult(){
     }
 }
 
+//生成报告
 document.getElementById("calcResultBtn").onclick = function(){
     const company = document.getElementById("companyName").value.trim();
     const post = document.getElementById("postName").value.trim();
     if(!company || !post){
-        alert("请先填写企业名称和实习岗位，并完成必要的风险核验");
+        alert("请先填写单位全称与岗位名称");
         return;
     }
     formData.companyName = company;
@@ -649,6 +672,7 @@ document.getElementById("calcResultBtn").onclick = function(){
     let reportHtml = "<h4>核心实习约定卡片详情</h4>";
     cRawList.filter(item=>item.core).forEach(card=>{
         const d = formData.cCard[card.key];
+        // 待填写的直接跳过，不输出
         if(d.status === "clear") return;
         const statusText = statusMap[d.status];
         const showContent = d.content || "无";
@@ -664,6 +688,7 @@ document.getElementById("calcResultBtn").onclick = function(){
     reportHtml += "<br><h4>拓展补充约定卡片详情</h4>";
     cRawList.filter(item=>!item.core).forEach(card=>{
         const d = formData.cCard[card.key];
+        // 待填写的直接跳过，不输出
         if(d.status === "clear") return;
         const statusText = statusMap[d.status];
         const showContent = d.content || "无";
@@ -681,6 +706,7 @@ document.getElementById("calcResultBtn").onclick = function(){
     document.getElementById("reportArea").classList.remove("report-hidden");
 }
 
+//导出PDF
 document.getElementById("exportPdfBtn").onclick = function(){
     const printDom = document.getElementById("reportArea");
     html2pdf().set({
@@ -690,23 +716,6 @@ document.getElementById("exportPdfBtn").onclick = function(){
         html2canvas:{scale:2},
         jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
     }).from(printDom).save();
-}
-
-document.getElementById("saveRecordBtn").onclick = function(){
-    const saveObj = {
-        id:Date.now(),
-        time:new Date().toLocaleString(),
-        companyName:formData.companyName,
-        postName:formData.postName,
-        jobText:formData.jobText,
-        hRule:JSON.parse(JSON.stringify(formData.hRule)),
-        cCard:JSON.parse(JSON.stringify(formData.cCard))
-    }
-    let list = JSON.parse(localStorage.getItem("internRecord")||"[]");
-    list.unshift(saveObj);
-    localStorage.setItem("internRecord",JSON.stringify(list));
-    alert("评估记录已保存，前往工作台查看！");
-    window.location.href="intern.html";
 }
 
 //OCR识图
