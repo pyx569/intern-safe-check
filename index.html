@@ -115,6 +115,60 @@
         .report-hidden{
             display:none;
         }
+        .h-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:14px 0;
+            border-bottom:1px solid #eee;
+            gap:20px;
+        }
+        .h-text{
+            flex:1;
+            line-height:1.6;
+        }
+        .h-radio-group{
+            flex-shrink:0;
+            white-space:nowrap;
+            display:flex;
+            gap:14px;
+            align-items:center;
+        }
+        .h-radio-group label{
+            display:flex;
+            align-items:center;
+            gap:4px;
+            cursor:pointer;
+        }
+        .h-radio-group input[type="radio"]{
+            width:auto;
+            margin:0;
+        }
+        .input-row{
+            display:flex;
+            gap:16px;
+            flex-wrap:wrap;
+            align-items:center;
+            margin-top:10px;
+        }
+        .input-item{
+            flex:1;
+            min-width:200px;
+        }
+        .expand-wrap{
+            margin-top:20px;
+        }
+        .expand-btn-area{
+            text-align:center;
+            margin-top:18px;
+        }
+        .expand-content{
+            display:none;
+            margin-top:16px;
+        }
+        .expand-content.show{
+            display:block;
+        }
         @media print{
             .no-print{display:none !important;}
         }
@@ -130,7 +184,6 @@
         </div>
     </div>
 
-    <!--步骤1：岗位信息录入 & OCR上传-->
     <div class="section">
         <div class="section-title">第一步：填写/识别岗位招聘信息</div>
         <textarea id="jobText" rows="6" placeholder="粘贴岗位描述，或者上传截图自动识别"></textarea>
@@ -139,33 +192,46 @@
             <button class="btn btn-warning" id="ocrBtn">开始识图提取文字</button>
             <span id="ocrTip"></span>
         </div>
-        <div style="margin-top:10px;">
-            <label>单位全称：<input id="companyName" placeholder="填写企业完整名称"></label>
-            <label style="margin-left:12px;">岗位名称：<input id="postName" placeholder="填写实习岗位"></label>
+        <div class="input-row">
+            <div class="input-item">
+                <label>单位全称：</label>
+                <input id="companyName" placeholder="填写企业完整名称">
+            </div>
+            <div class="input-item">
+                <label>岗位名称：</label>
+                <input id="postName" placeholder="填写实习岗位">
+            </div>
+            <div style="margin-top:22px">
+                <button class="btn btn-primary" id="checkCompanyBtn">一键工商核验</button>
+            </div>
         </div>
     </div>
 
-    <!--步骤2：H1‑H17风险核验问卷-->
     <div class="section">
         <div class="section-title">第二步：17项实习风险人工核验</div>
         <div id="hList"></div>
     </div>
 
-    <!--步骤3：C01‑C20 状态核验卡片-->
     <div class="section">
         <div class="section-title">第三步：实习约定信息核验卡片（点击卡片编辑详情）</div>
-        <div class="card-grid" id="cCardWrap"></div>
+        <div id="coreCardWrap" class="card-grid"></div>
+
+        <div class="expand-btn-area no-print">
+            <button class="btn" id="toggleExpandBtn">展开拓展约定项</button>
+        </div>
+
+        <div class="expand-content" id="expandPanel">
+            <p style="margin:12px 0;color:#666;">拓展补充约定（可选核验项）</p>
+            <div id="expandCardWrap" class="card-grid"></div>
+        </div>
     </div>
 
-    <!--计算结果按钮-->
     <div style="text-align:center;margin:20px 0;">
         <button class="btn btn-success" id="calcResultBtn">生成风险评估报告</button>
     </div>
 
-    <!--评估结果展示区-->
     <div id="resultWrap"></div>
 
-    <!--完整实习约定卡报告区域（打印/PDF）-->
     <div id="reportArea" class="report-hidden">
         <div class="section">
             <div class="section-title">📄实习约定确认卡</div>
@@ -185,17 +251,16 @@
     </div>
 </div>
 
-<!--编辑C卡片弹窗-->
 <div class="modal" id="editModal">
     <div class="modal-box">
         <h3 id="modalTitle">编辑卡片信息</h3>
         <div style="margin:10px 0;">
             <label>状态</label>
-            <select id="cardStatus">
+            <select id="cardStatus" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:6px;">
                 <option value="clear">待填写</option>
                 <option value="pending">待确认</option>
                 <option value="confirm">已确认</option>
-                <option value="na">不适用</option>
+                <option id="naOption" value="na">不适用</option>
             </select>
         </div>
         <div style="margin:10px 0;">
@@ -204,7 +269,7 @@
         </div>
         <div style="margin:10px 0;">
             <label>信息来源类型</label>
-            <select id="cardSourceType">
+            <select id="cardSourceType" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:6px;">
                 <option value="协议">协议</option>
                 <option value="聊天记录">聊天记录</option>
                 <option value="公告">公告</option>
@@ -220,11 +285,11 @@
             <label>确认方</label>
             <input id="cardConfirmBy">
         </div>
-        <div style="margin:10px 0;">
+        <div id="naReasonWrap" style="margin:10px 0;display:none;">
             <label>不适用原因（选「不适用」必填）</label>
             <textarea id="cardNaReason" rows="2"></textarea>
         </div>
-        <div style="display:flex;gap:10px;margin-top:16px;">
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
             <button class="btn" id="cancelEdit">取消</button>
             <button class="btn btn-primary" id="saveEdit">保存</button>
         </div>
@@ -232,8 +297,8 @@
 </div>
 
 <script>
-// ========== 全局数据定义 ==========
 let currentEditKey = "";
+let expandOpened = false;
 let formData = {
     companyName:"",
     postName:"",
@@ -242,38 +307,49 @@ let formData = {
     cCard:{}
 };
 
-// 新版H1‑H17风险规则（完全替换手册更新文案 + 独立核验链接）
 const hRawList = [
-    {key:"H1",title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H2",title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H3",title:"异地外派风险",desc:"要求前往外地培训、上岗，不提供正规办公地址",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H4",title:"身份证件扣押",desc:"要求上交身份证、银行卡原件或者索要验证码",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H5",title:"借贷刷单任务",desc:"工作内容包含刷单、转账垫资、贷款操作",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H6",title:"传销层级计酬",desc:"报酬依靠拉人头发展下线获取收益",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H7",title:"空白合同签署",desc:"签署空白文件，放弃明确薪酬约定",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H8",title:"竞业无限扩大",desc:"协议包含宽泛无边界的竞业限制",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H9",title:"敏感信息采集",desc:"无合理必要理由强制采集人脸、声纹等隐私敏感数据",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H10",title:"空白授权文件",desc:"签署空白文件、放弃书面明确的劳动权益",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H11",title:"不等责协议责任",desc:"协议设置不对等的高额违约责任",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H12",title:"无偿加班强制要求",desc:"强制无偿加班且无补偿方案",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H13",title:"违规高强度夜班",desc:"安排未成年人或者在校学生长期夜班高危作业",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H14",title:"单方面变更约定",desc:"企业可以随意变更岗位、薪资、工作地点而学生无权拒绝",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H15",title:"变相收费扣款",desc:"通过罚款、扣费变相收取实习相关费用",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H16",title:"外包转嫁用工责任",desc:"实际用工方和签约主体不一致，责任模糊不清",verifyUrl:"https://www.gsxt.gov.cn/"},
-    {key:"H17",title:"视频采集核验",desc:"要求录制承诺视频、人脸视频作为考核或者约束手段",verifyUrl:"https://www.gsxt.gov.cn/"}
+    {title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用"},
+    {title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺"},
+    {title:"异地外派风险",desc:"要求前往外地培训、上岗，不提供正规办公地址"},
+    {title:"身份证件扣押",desc:"要求上交身份证、银行卡原件或者索要验证码"},
+    {title:"借贷刷单任务",desc:"工作内容包含刷单、转账垫资、贷款操作"},
+    {title:"传销层级计酬",desc:"报酬依靠拉人头发展下线获取收益"},
+    {title:"空白合同签署",desc:"签署空白文件，放弃明确薪酬约定"},
+    {title:"竞业无限扩大",desc:"协议包含宽泛无边界的竞业限制"},
+    {title:"敏感信息采集",desc:"无合理必要理由强制采集人脸、声纹等隐私敏感数据"},
+    {title:"空白授权文件",desc:"签署空白文件、放弃书面明确的劳动权益"},
+    {title:"不等责协议责任",desc:"协议设置不对等的高额违约责任"},
+    {title:"无偿加班强制要求",desc:"强制无偿加班且无补偿方案"},
+    {title:"违规高强度夜班",desc:"安排未成年人或者在校学生长期夜班高危作业"},
+    {title:"单方面变更约定",desc:"企业可以随意变更岗位、薪资、工作地点而学生无权拒绝"},
+    {title:"变相收费扣款",desc:"通过罚款、扣费变相收取实习相关费用"},
+    {title:"外包转嫁用工责任",desc:"实际用工方和签约主体不一致，责任模糊不清"},
+    {title:"视频采集核验",desc:"要求录制承诺视频、人脸视频作为考核或者约束手段"}
 ];
 
-// C卡片完整定义 C01‑C20，区分核心/扩展
-const cRawList = [];
-for(let i=1;i<=20;i++){
-    cRawList.push({
-        key:"C"+String(i).padStart(2,"0"),
-        name:"约定项C"+String(i).padStart(2,"0"),
-        core:i<=10
-    })
-}
+const cRawList = [
+    {key:"C01",name:"实习薪资标准",core:true,disableNa:true},
+    {key:"C02",name:"薪资发放时间",core:true,disableNa:true},
+    {key:"C03",name:"工资发放方式",core:true,disableNa:true},
+    {key:"C04",name:"每日工作时长",core:true,disableNa:true},
+    {key:"C05",name:"每周休息安排",core:true,disableNa:true},
+    {key:"C06",name:"实习起止日期",core:true,disableNa:true},
+    {key:"C07",name:"实习具体岗位",core:true,disableNa:true},
+    {key:"C08",name:"办公工作地点",core:true,disableNa:true},
+    {key:"C09",name:"加班补偿规则",core:true,disableNa:true},
+    {key:"C10",name:"实习证明开具约定",core:true,disableNa:true},
+    {key:"C11",name:"住宿福利安排",core:false,disableNa:false},
+    {key:"C12",name:"餐补交通补贴",core:false,disableNa:false},
+    {key:"C13",name:"岗前培训内容",core:false,disableNa:false},
+    {key:"C14",name:"培训费用承担方",core:false,disableNa:false},
+    {key:"C15",name:"离职提前告知期限",core:false,disableNa:false},
+    {key:"C16",name:"实习考核规则",core:false,disableNa:false},
+    {key:"C17",name:"保险保障方案",core:false,disableNa:false},
+    {key:"C18",name:"岗位调动约束条件",core:false,disableNa:false},
+    {key:"C19",name:"保密协议内容",core:false,disableNa:false},
+    {key:"C20",name:"违约追责条款",core:false,disableNa:false}
+];
 
-//初始化卡片默认对象
 function initEmptyCard(){
     return {
         status:"clear",
@@ -286,7 +362,6 @@ function initEmptyCard(){
     }
 }
 
-//重置全部数据（岗位内容变更清空旧结果 P0‑3）
 function resetAllData(){
     formData.hRule = hRawList.map(item=>{
         return {...item,ans:"u"};
@@ -301,29 +376,23 @@ function resetAllData(){
     renderCCard();
 }
 
-//渲染H问卷列表
 function renderH(){
     const wrap = document.getElementById("hList");
     wrap.innerHTML = "";
     formData.hRule.forEach((item,idx)=>{
         const div = document.createElement("div");
-        div.style.padding="12px 0";
-        div.style.borderBottom="1px solid #eee";
+        div.className = "h-item";
         div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-                <strong>${item.key}</strong> ${item.title} — ${item.desc}
-                <div><a target="_blank" href="${item.verifyUrl}">企业核验入口</a></div>
+            <div class="h-text">
+                <strong>${item.title}</strong> — ${item.desc}
             </div>
-            <div>
+            <div class="h-radio-group">
                 <label><input type="radio" name="h${idx}" value="y">是</label>
                 <label><input type="radio" name="h${idx}" value="n">否</label>
                 <label><input type="radio" name="h${idx}" value="u" checked>不确定</label>
-            </div>
-        </div>`;
+            </div>`;
         wrap.appendChild(div);
     })
-    //绑定单选赋值
     document.querySelectorAll('input[type="radio"]').forEach(radio=>{
         radio.onchange = function(){
             const idx = Number(this.name.replace("h",""));
@@ -332,37 +401,84 @@ function renderH(){
     })
 }
 
-//渲染C卡片
 function renderCCard(){
-    const wrap = document.getElementById("cCardWrap");
-    wrap.innerHTML = "";
+    const coreWrap = document.getElementById("coreCardWrap");
+    const expandWrap = document.getElementById("expandCardWrap");
+    coreWrap.innerHTML = "";
+    expandWrap.innerHTML = "";
+
     cRawList.forEach(cfg=>{
         const cardData = formData.cCard[cfg.key];
         const dom = document.createElement("div");
         dom.className = `c-card status-${cardData.status}`;
         dom.innerText = cfg.name;
         dom.onclick = ()=>openEditModal(cfg.key);
-        wrap.appendChild(dom);
+        if(cfg.core){
+            coreWrap.appendChild(dom);
+        }else{
+            expandWrap.appendChild(dom);
+        }
     })
 }
 
-//弹窗编辑逻辑
+// 折叠展开按钮逻辑
+const toggleBtn = document.getElementById("toggleExpandBtn");
+const expandPanel = document.getElementById("expandPanel");
+toggleBtn.onclick = function(){
+    expandOpened = !expandOpened;
+    if(expandOpened){
+        expandPanel.classList.add("show");
+        toggleBtn.innerText = "收起拓展约定项";
+    }else{
+        expandPanel.classList.remove("show");
+        toggleBtn.innerText = "展开拓展约定项";
+    }
+}
+
 const modal = document.getElementById("editModal");
+const naOption = document.getElementById("naOption");
+const naReasonWrap = document.getElementById("naReasonWrap");
+const cardStatusSel = document.getElementById("cardStatus");
+
+cardStatusSel.onchange = function(){
+    if(this.value === "na"){
+        naReasonWrap.style.display = "block";
+    }else{
+        naReasonWrap.style.display = "none";
+    }
+}
+
 function openEditModal(key){
     currentEditKey = key;
     const cfg = cRawList.find(x=>x.key===key);
     document.getElementById("modalTitle").innerText = "编辑："+cfg.name;
     const d = formData.cCard[key];
-    document.getElementById("cardStatus").value = d.status;
+
+    if(cfg.disableNa){
+        naOption.style.display = "none";
+        if(d.status === "na") d.status = "clear";
+    }else{
+        naOption.style.display = "block";
+    }
+
+    cardStatusSel.value = d.status;
     document.getElementById("cardContent").value = d.content;
     document.getElementById("cardSourceType").value = d.contentType;
     document.getElementById("cardSourceNote").value = d.sourceNote;
     document.getElementById("cardConfirmBy").value = d.confirmBy;
     document.getElementById("cardNaReason").value = d.naReason;
+
+    if(cardStatusSel.value === "na" && !cfg.disableNa){
+        naReasonWrap.style.display = "block";
+    }else{
+        naReasonWrap.style.display = "none";
+    }
     modal.style.display = "flex";
 }
+
 document.getElementById("cancelEdit").onclick = ()=>modal.style.display="none";
 document.getElementById("saveEdit").onclick = function(){
+    const cfg = cRawList.find(x=>x.key===currentEditKey);
     const obj = formData.cCard[currentEditKey];
     obj.status = document.getElementById("cardStatus").value;
     obj.content = document.getElementById("cardContent").value;
@@ -375,52 +491,53 @@ document.getElementById("saveEdit").onclick = function(){
     renderCCard();
 }
 
-//P0‑2 严格红绿黄判定算法
 function calcRiskResult(){
-    //1.存在任意一条 y=是 →红色
     const hasYes = formData.hRule.some(i=>i.ans === "y");
     if(hasYes) return {level:"red",text:"🔴 高风险提示：问卷识别到明确的实习风险行为，请谨慎选择该实习岗位。"};
-    //2.存在不确定u →黄色待核验
     const hasUnknown = formData.hRule.some(i=>i.ans === "u");
     if(hasUnknown) return {level:"yellow",text:"🟡 待核验：部分风险项信息不足，建议补充确认企业信息。"};
-    //3.H全部安全，校验C01‑C10是否全部confirm
     const coreC = cRawList.filter(x=>x.core === true).map(x=>x.key);
     const coreAllConfirm = coreC.every(k=>formData.cCard[k].status === "confirm");
     if(!coreAllConfirm){
         return {level:"yellow",text:"🟡 待核验：风险问卷全部安全，但核心实习约定信息尚未完整确认。"}
     }
-    //4.全部达标：绿色固定文案
     return {level:"green",text:"🟢 在用户提供全部证据与当前规则覆盖范围内，暂未发现已确认的高风险信号，核心约定信息相对完整。本结果不构成安全认证或者法律意见。"}
 }
 
-//生成完整报告内容
 function buildReport(){
     const resObj = calcRiskResult();
-    //结果块
     document.getElementById("resultWrap").innerHTML = `<div class="result-block ${resObj.level}">${resObj.text}</div>`;
-    //报告详情
-    let html = `<div><strong>报告基础信息</strong><ul>
+    let html = `<div><strong>报告基础信息</strong><ul style="margin:8px 0 8px 20px;">
     <li>企业全称：${formData.companyName || "未填写"}</li>
     <li>实习岗位：${formData.postName || "未填写"}</li>
     <li>报告生成时间：${new Date().toLocaleString()}</li>
     </ul></div>`;
-    html += `<div style="margin-top:16px;"><strong>实习约定卡片详情</strong><br>`;
-    cRawList.forEach(item=>{
+
+    html += `<div style="margin-top:16px;"><strong>核心实习约定卡片详情</strong><br>`;
+    cRawList.filter(item=>item.core).forEach(item=>{
         const d = formData.cCard[item.key];
-        html += `<div style="padding:8px 0;border-bottom:1px solid #eee;">
-        <strong>${item.key}</strong> 状态：${d.status}｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"-"}｜更新：${d.updatedAt||""}
-        ${d.status==="na"?"｜不适用原因："+d.naReason:""}
+        html += `<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:14px;">
+        <strong>${item.name}</strong> 状态：${d.status}｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"-"}｜更新：${d.updatedAt||""}
         </div>`;
     })
     html += `</div>`;
-    //自动生成确认话术
+
+    html += `<div style="margin-top:16px;"><strong>拓展补充约定卡片详情</strong><br>`;
+    cRawList.filter(item=>!item.core).forEach(item=>{
+        const d = formData.cCard[item.key];
+        html += `<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:14px;">
+        <strong>${item.name}</strong> 状态：${d.status}｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"-"}｜更新：${d.updatedAt||""}
+        ${(!item.disableNa && d.status==="na")?"｜不适用原因："+d.naReason:""}
+        </div>`;
+    })
+    html += `</div>`;
+
     const confirmText = "您好，向您确认本次实习约定内容："+Object.values(formData.cCard).filter(x=>x.content).map(x=>x.content).join("；")+"，请确认是否无误。";
     document.getElementById("confirmMsg").innerText = confirmText;
     document.getElementById("reportContent").innerHTML = html;
     document.getElementById("reportArea").classList.remove("report-hidden");
 }
 
-//PDF导出，隐藏操作按钮
 document.getElementById("exportPdfBtn").onclick = function(){
     const opt = {
         margin:10,
@@ -432,7 +549,6 @@ document.getElementById("exportPdfBtn").onclick = function(){
     html2pdf().set(opt).from(printDom).save();
 }
 
-//保存记录到localStorage（对接工作台intern.html）
 document.getElementById("saveRecordBtn").onclick = function(){
     const saveObj = {
         id:Date.now(),
@@ -449,7 +565,6 @@ document.getElementById("saveRecordBtn").onclick = function(){
     alert("评估记录已保存，前往工作台查看！");
 }
 
-//岗位文本变更触发重置（P0‑3）
 document.getElementById("jobText").oninput = function(){
     resetAllData();
     formData.jobText = this.value;
@@ -457,10 +572,12 @@ document.getElementById("jobText").oninput = function(){
 document.getElementById("companyName").oninput = ()=>formData.companyName = document.getElementById("companyName").value;
 document.getElementById("postName").oninput = ()=>formData.postName = document.getElementById("postName").value;
 
-//生成报告按钮
+document.getElementById("checkCompanyBtn").onclick = function(){
+    window.open("https://www.gsxt.gov.cn/","_blank");
+}
+
 document.getElementById("calcResultBtn").onclick = buildReport;
 
-//OCR识图逻辑
 document.getElementById("ocrBtn").onclick = async function(){
     const file = document.getElementById("ocrFile").files[0];
     if(!file)return alert("请先选择图片");
@@ -476,7 +593,6 @@ document.getElementById("ocrBtn").onclick = async function(){
     }
 }
 
-//页面初始化
 resetAllData();
 </script>
 </body>
