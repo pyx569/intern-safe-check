@@ -12,8 +12,6 @@
 
     <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
 
         * {
@@ -344,6 +342,8 @@
 
             .no-print{display:none !important;}
 
+            body{padding:0; background:#fff;}
+
         }
 
     </style>
@@ -460,7 +460,7 @@
 
 
 
-    <div style="text-align:center;margin:20px 0;">
+    <div style="text-align:center;margin:20px 0;" class="no-print">
 
         <button class="btn btn-success" id="calcResultBtn">生成风险评估报告</button>
 
@@ -1140,62 +1140,14 @@ function buildReport(){
 }
 
 
-// ==========修复后的导出PDF函数==========
 document.getElementById("exportPdfBtn").onclick = function(){
-    let pdfHtml = `
-    <div style="font-family:'Microsoft YaHei';padding:20px;">
-        <h2>实习岗位风险评估报告</h2>
-        <p>生成时间：${new Date().toLocaleString()}</p>
-        <hr/>
-        <h3>基础信息</h3>
-        <p>企业全称：${formData.companyName || "未填写"}</p>
-        <p>实习岗位：${formData.postName || "未填写"}</p>
-        <hr/>
-        <h3>核心实习约定</h3>
-    `;
-    cRawList.filter(item=>item.core).forEach(cfg=>{
-        const d = formData.cCard[cfg.key];
-        pdfHtml += `<p><strong>${cfg.name}</strong>：状态(${d.status})｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"无"}`;
-        if(!cfg.disableNa && d.status==="na"){
-            pdfHtml += `｜不适用原因：${d.naReason||"无"}`;
-        }
-        pdfHtml += `</p>`;
-    });
-
-    pdfHtml += `<hr/><h3>拓展补充约定</h3>`;
-    cRawList.filter(item=>!item.core).forEach(cfg=>{
-        const d = formData.cCard[cfg.key];
-        pdfHtml += `<p><strong>${cfg.name}</strong>：状态(${d.status})｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"无"}`;
-        if(!cfg.disableNa && d.status==="na"){
-            pdfHtml += `｜不适用原因：${d.naReason||"无"}`;
-        }
-        pdfHtml += `</p>`;
-    });
-
-    pdfHtml += `<hr/><h3>17项风险核验清单</h3>`;
-    formData.hRule.forEach(r=>{
-        let resTxt = "不确定";
-        if(r.ans === "y") resTxt = "存在风险";
-        if(r.ans === "n") resTxt = "无风险";
-        pdfHtml += `<p>${r.title}：${resTxt}</p>`;
-    });
-
-    pdfHtml += `
-    <hr/>
-    <p style="font-size:12px;color:#444;margin-top:20px;">免责声明：本工具提供的内容仅作为实习参考，不替代劳动合同、实习协议或法律意见。评估结果不构成安全认证，不代表企业承诺。</p>
-    </div>`;
-
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = pdfHtml;
-
-    const opt = {
-        margin:12,
-        filename:`${formData.companyName||"实习风险评估报告"}.pdf`,
-        html2canvas:{ scale:2, useCORS:true },
-        jsPDF:{ unit:"mm", format:"a4", orientation:"portrait" }
-    };
-    html2pdf().set(opt).from(tempDiv).save();
-}
+    const reportDom = document.getElementById("reportArea");
+    if(reportDom.classList.contains("report-hidden")){
+        alert("请先点击【生成风险评估报告】！");
+        return;
+    }
+    window.print();
+};
 
 
 
