@@ -51,6 +51,10 @@
             background:#52c41a;
             color:#fff;
         }
+        .btn-reset{
+            background:#86909c;
+            color:#fff;
+        }
         .section{
             margin-bottom:32px;
             border:1px solid #eee;
@@ -175,6 +179,12 @@
             border-bottom:1px solid #efefef;
             line-height:1.7;
         }
+        .btn-group-row{
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            flex-wrap:wrap;
+        }
         @media print{
             .no-print{display:none !important;}
             body{padding:0; background:#fff;}
@@ -233,9 +243,11 @@
         </div>
     </div>
 
-    <div style="text-align:center;margin:20px 0;" class="no-print">
+    <div class="no-print btn-group-row">
         <button class="btn btn-success" id="calcResultBtn">生成风险评估报告</button>
+        <button class="btn btn-reset" id="resetAllBtn">重置全部表单</button>
     </div>
+
     <div id="resultWrap" class="no-print"></div>
 
     <div id="reportArea" class="report-hidden">
@@ -394,6 +406,26 @@ function initEmptyCard(){
         updatedAt:"",
         naReason:""
     }
+}
+
+//【新增：全部重置按钮逻辑】
+document.getElementById("resetAllBtn").onclick = function(){
+    if(!confirm("确定要重置全部表单？所有填写内容、风险选项、卡片数据都会恢复默认！")){
+        return;
+    }
+    //清空输入框
+    document.getElementById("companyName").value = "";
+    document.getElementById("postName").value = "";
+    document.getElementById("jobText").value = "";
+    formData.companyName = "";
+    formData.postName = "";
+    formData.jobText = "";
+    //重置业务数据
+    resetAllData();
+    //收回拓展面板
+    expandOpened = false;
+    document.getElementById("expandPanel").classList.remove("show");
+    document.getElementById("toggleExpandBtn").innerText = "展开拓展约定项";
 }
 
 //输入框失去焦点change事件触发重置
@@ -640,7 +672,7 @@ document.getElementById("calcResultBtn").onclick = function(){
     let reportHtml = "<h4>核心实习约定卡片详情</h4>";
     cRawList.filter(item=>item.core).forEach(card=>{
         const d = formData.cCard[card.key];
-        // ✅ 待填写的直接跳过，不输出
+        // 待填写的直接跳过，不输出
         if(d.status === "clear") return;
         const statusText = statusMap[d.status];
         const showContent = d.content || "无";
@@ -656,7 +688,7 @@ document.getElementById("calcResultBtn").onclick = function(){
     reportHtml += "<br><h4>拓展补充约定卡片详情</h4>";
     cRawList.filter(item=>!item.core).forEach(card=>{
         const d = formData.cCard[card.key];
-        // ✅ 待填写的直接跳过，不输出
+        // 待填写的直接跳过，不输出
         if(d.status === "clear") return;
         const statusText = statusMap[d.status];
         const showContent = d.content || "无";
