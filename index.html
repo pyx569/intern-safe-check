@@ -564,7 +564,7 @@ function openEditModal(key){
 
 document.getElementById("cancelEdit").onclick = ()=>modal.style.display="none";
 
-//【修复后的保存校验逻辑】
+//卡片保存校验
 document.getElementById("saveEdit").onclick = function(){
     const cfg = cRawList.find(x=>x.key===currentEditKey);
     const obj = formData.cCard[currentEditKey];
@@ -574,14 +574,12 @@ document.getElementById("saveEdit").onclick = function(){
     const confirmUser = document.getElementById("cardConfirmBy").value.trim();
     const naReasonVal = document.getElementById("cardNaReason").value.trim();
 
-    //规则1：状态=已确认，三项不能为空
     if(st === "confirm"){
         if(!cnt || !srcType || !confirmUser){
             alert("标记为【已确认】时，必须填写具体内容、信息来源与确认方");
             return;
         }
     }
-    //规则2：状态=不适用，不适用原因不能为空
     if(st === "na"){
         if(!naReasonVal){
             alert("选择【不适用】必须填写不适用原因！");
@@ -624,7 +622,7 @@ function calcRiskResult(){
     }
 }
 
-//生成报告按钮
+//生成报告
 document.getElementById("calcResultBtn").onclick = function(){
     const company = document.getElementById("companyName").value.trim();
     const post = document.getElementById("postName").value.trim();
@@ -639,31 +637,40 @@ document.getElementById("calcResultBtn").onclick = function(){
     const wrap = document.getElementById("resultWrap");
     wrap.innerHTML = `<div class="result-block ${res.level}">${res.text}</div>`;
 
-    //拼接中文完整确认卡内容
     let reportHtml = "<h4>核心实习约定卡片详情</h4>";
     cRawList.filter(item=>item.core).forEach(card=>{
         const d = formData.cCard[card.key];
+        // ✅ 待填写的直接跳过，不输出
+        if(d.status === "clear") return;
         const statusText = statusMap[d.status];
         const showContent = d.content || "无";
         const sourceText = d.contentType || "协议";
         const confirmPerson = d.confirmBy || "—";
-        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}</div>`;
+        let extra = "";
+        if(d.status === "na"){
+            extra = `｜不适用原因：${d.naReason||""}`;
+        }
+        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}${extra}</div>`;
     });
 
     reportHtml += "<br><h4>拓展补充约定卡片详情</h4>";
     cRawList.filter(item=>!item.core).forEach(card=>{
         const d = formData.cCard[card.key];
+        // ✅ 待填写的直接跳过，不输出
+        if(d.status === "clear") return;
         const statusText = statusMap[d.status];
         const showContent = d.content || "无";
         const sourceText = d.contentType || "协议";
         const confirmPerson = d.confirmBy || "—";
-        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}</div>`;
+        let extra = "";
+        if(d.status === "na"){
+            extra = `｜不适用原因：${d.naReason||""}`;
+        }
+        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}${extra}</div>`;
     });
 
     document.getElementById("reportContent").innerHTML = reportHtml;
-    //HR话术
     document.getElementById("confirmMsg").innerText = `您好，针对本次实习，我方确认以下实习约定，请核对：企业【${formData.companyName}】岗位【${formData.postName}】，请书面确认实习薪资、工时、休息、补贴等全部实习条款。`;
-
     document.getElementById("reportArea").classList.remove("report-hidden");
 }
 
@@ -679,7 +686,7 @@ document.getElementById("exportPdfBtn").onclick = function(){
     }).from(printDom).save();
 }
 
-//OCR识图简易逻辑（本地前端识别）
+//OCR识图
 const ocrFile = document.getElementById("ocrFile");
 const ocrBtn = document.getElementById("ocrBtn");
 const ocrTip = document.getElementById("ocrTip");
