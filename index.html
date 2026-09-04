@@ -16,19 +16,30 @@
         .home-card:hover{background:#e1eaf3;transform:translateY(-4px);}
         .home-card h3{font-size:18px;color:#2c3e50;margin-bottom:8px;}
         .home-card p{font-size:14px;color:#666;}
-        .risk-area{border-top:1px solid #eee;padding-top:24px;}
+        .step-block{display:none;margin-bottom:24px;}
         textarea{width:100%;min-height:130px;border:1px solid #dde2e8;border-radius:10px;padding:14px;font-size:15px;resize:vertical;margin-bottom:16px;}
-        .btn-group{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+        .modify-alert{background:#ffebeb;color:#c0392b;padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid #f8caca;}
+        .extract-tip{background:#fff8dc;padding:14px;border-radius:10px;border:1px solid #f0d890;margin-bottom:16px;}
+        .extract-tip strong{color:#c48b00;}
+        .risk-question{border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;}
+        .q-title{font-weight:bold;margin-bottom:8px;color:#2c3e50;}
+        .opt-group{display:flex;gap:10px;margin-top:8px;}
+        .opt-btn{padding:6px 16px;border-radius:6px;border:1px solid #cbd5e0;background:#fff;cursor:pointer;}
+        .opt-btn.y{border-color:#ef4444;color:#ef4444;}
+        .opt-btn.n{border-color:#10b981;color:#10b981;}
+        .opt-btn.u{border-color:#f59e0b;color:#f59e0b;}
+        .opt-btn.active{background:#edf2f7;font-weight:bold;}
+        .btn-group{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
         button{padding:11px 20px;border:none;border-radius:8px;color:#fff;font-size:15px;cursor:pointer;}
         .btn-blue{background:#3488eb;}
         .btn-green{background:#27ae60;}
         .btn-purple{background:#9b59b6;}
-        .btn-yellow{background:#f1c40f;color:#222;margin:20px auto;display:block;padding:12px 24px;font-weight:bold;}
+        .btn-gray{background:#94a3b8;}
+        .btn-clear{background:#e74c3c;}
+        button:disabled{background:#bdc3c7;cursor:not-allowed;opacity:0.7;}
         .danger-tip{background:#ffe9e9;color:#c0392b;border:2px solid #ec7063;padding:14px;border-radius:10px;margin-bottom:20px;text-align:center;font-weight:bold;}
-        .risk-item{background:#fef0f0;border-left:5px solid #e74c3c;padding:16px;border-radius:8px;margin-bottom:12px;}
-        .risk-title{font-weight:bold;font-size:16px;margin-bottom:6px;color:#c0392b;}
-        .risk-desc{font-size:14px;color:#444;margin-bottom:6px;line-height:1.6;}
-        .risk-suggest{font-size:14px;color:#2980b9;line-height:1.6;}
+        .safe-tip{background:#e8f5e9;color:#2e7d32;border:2px solid #66bb6a;padding:14px;border-radius:10px;margin-bottom:20px;text-align:center;font-weight:bold;}
+        .wait-tip{background:#fff3e0;color:#e65100;border:2px solid #ffb74d;padding:14px;border-radius:10px;margin-bottom:20px;text-align:center;font-weight:bold;}
         .grid-card{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:20px;}
         .contract-card{background:#fff9ef;border:1px solid #f8d7b9;padding:14px;border-radius:10px;cursor:pointer;transition:0.2s;}
         .contract-card:hover{box-shadow:0 2px 8px #00000015;}
@@ -42,34 +53,100 @@
         .pop-btn{display:flex;gap:10px;margin-top:15px;justify-content:flex-end;}
         .hidden{display:none !important;}
         #imgFile{display:none;}
+        .result-block{margin-top:20px;}
+        .section-title{font-size:18px;font-weight:bold;margin:16px 0 8px;color:#2c3e50;border-bottom:1px solid #eee;padding-bottom:6px;}
+        .risk-item{background:#fef0f0;border-left:5px solid #e74c3c;padding:16px;border-radius:8px;margin-bottom:12px;}
+        .pending-item{background:#fff8dc;border-left:5px solid #f59e0b;padding:16px;border-radius:8px;margin-bottom:12px;}
+        .disclaimer{margin-top:30px;padding:14px;background:#f7f8fa;border-radius:8px;font-size:13px;color:#666;line-height:1.6;}
+        .core-tag{display:inline-block;background:#3488eb;color:#fff;font-size:12px;padding:2px 6px;border-radius:4px;margin-right:4px;}
+        .ext-tag{display:inline-block;background:#94a3b8;color:#fff;font-size:12px;padding:2px 6px;border-radius:4px;margin-right:4px;}
+        .fold-header{padding:12px 14px;background:#edf2f7;border-radius:8px;cursor:pointer;margin-top:16px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;}
+        .fold-body{margin-top:12px;display:none;}
+        .fold-body.open{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
     </style>
 </head>
 <body>
 <div class="container">
     <h1>实习有约｜风险体检系统</h1>
     <div class="home-card-wrap">
-        <div class="home-card" onclick="showInternPanel()">
+        <div class="home-card" onclick="startFlow()">
             <h3>实习风险评估</h3>
-            <p>岗位风险检测、实习工作台</p>
-        </div>
-        <div class="home-card" onclick="alert('该功能正在开发中，敬请期待！')">
-            <h3>线上兼职</h3>
-            <p>功能开发中</p>
+            <p>岗位录入→人工核验风险问卷→生成报告</p>
         </div>
     </div>
 
-    <div id="internPanel" class="risk-area" style="display:none;">
+    <div id="step1" class="step-block">
+        <h3>步骤1：录入岗位信息</h3>
+        <div id="changeWarn" class="modify-alert hidden">⚠️ 内容已修改，请重新执行完整评估流程</div>
         <textarea id="jobText" placeholder="粘贴完整实习岗位描述，或上传截图识别文字"></textarea>
         <div class="btn-group">
             <button class="btn-blue" onclick="document.getElementById('imgFile').click()">上传截图识别文字</button>
             <input id="imgFile" type="file" accept="image/*">
-            <button class="btn-green" onclick="checkRisk()">生成评估卡片</button>
-            <button class="btn-purple" onclick="exportPdf()">导出PDF报告</button>
+            <button class="btn-green" onclick="goStep2()">提取待确认线索</button>
+            <button class="btn-clear" onclick="clearAllData()">一键清空全部记录</button>
         </div>
-        <div id="warnBox"></div>
-        <div id="riskList"></div>
-        <div class="grid-card" id="contractWrap"></div>
-        <button id="enterWorkBtn" class="btn-yellow hidden" onclick="window.location.href='intern.html'">进入实习工作台</button>
+    </div>
+
+    <div id="step2" class="step-block">
+        <h3>步骤2：系统提取待确认线索</h3>
+        <div class="extract-tip">
+            <strong>待确认线索（仅供参考，不自动判定风险）</strong>
+            <div id="extractContent"></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-gray" onclick="goStep1()">上一步</button>
+            <button class="btn-blue" onclick="goStep3()">进入风险核验问卷（H01‑H17）</button>
+        </div>
+    </div>
+
+    <div id="step3" class="step-block">
+        <h3>步骤3：风险核验问卷 H01‑H17</h3>
+        <div id="questionWrap"></div>
+        <div class="btn-group">
+            <button class="btn-gray" onclick="goStep2()">上一步</button>
+            <button class="btn-blue" onclick="goStep4()">提交问卷，核查协议信息</button>
+        </div>
+    </div>
+
+    <div id="step4" class="step-block">
+        <h3>步骤4：实习约定信息完整性核查（C01‑C20）</h3>
+        <div class="section-title">核心必填项（C01‑C10）</div>
+        <div class="grid-card" id="coreCardWrap"></div>
+
+        <div class="fold-header" onclick="toggleExtend()">
+            <span>扩展补充项（C11‑C20）</span>
+            <span id="foldIcon">▼ 点击展开</span>
+        </div>
+        <div class="fold-body" id="extendCardWrap"></div>
+
+        <div class="btn-group">
+            <button class="btn-gray" onclick="goStep3()">上一步</button>
+            <button class="btn-green" onclick="buildFinalReport()">生成最终评估报告</button>
+        </div>
+    </div>
+
+    <div id="step5" class="step-block">
+        <h3>步骤5：实习风险评估结论报告</h3>
+        <div id="finalAlert"></div>
+        <div class="result-block">
+            <div class="section-title">高风险命中清单（回答【是】）</div>
+            <div id="hitRiskList"></div>
+            <div class="section-title">待核验清单（回答【不确定】）</div>
+            <div id="pendingList"></div>
+            <div class="section-title">实习约定信息完整度</div>
+            <div id="cCheckResult"></div>
+            <div class="section-title">下一步建议动作</div>
+            <div id="actionList"></div>
+            <div class="disclaimer">
+                <p><strong>免责声明：</strong>本系统输出结果仅作为风险提示工具，不构成安全认证或法律意见，不代表实习岗位绝对安全。所有风险判断以人工核验、企业官方信息、书面实习协议为准。</p>
+                <p><strong>隐私提示：</strong>本次填写的全部数据仅保存在当前浏览器本地，不会上传至外部服务器，可随时点击「一键清空全部记录」删除本地缓存。</p>
+            </div>
+        </div>
+        <div class="btn-group" style="margin-top:24px;">
+            <button id="pdfExportBtn" class="btn-purple" onclick="exportPdf()" disabled>导出PDF报告</button>
+            <button class="btn-gray" onclick="resetAll()">重新开始评估</button>
+            <button class="btn-clear" onclick="clearAllData()">一键清空全部记录</button>
+        </div>
     </div>
 </div>
 
@@ -87,326 +164,315 @@
 <div id="pdfDom" style="display:none;padding:20px;"></div>
 
 <script>
-let cardData = JSON.parse(localStorage.getItem("contractCard")) || {
-    c01:"",c02:"",c03:"",c04:"",c05:"",c06:"",c07:"",c08:"",c09:"",c10:""
+let flowData = {
+    rawText: "",
+    originalRaw: "",
+    extractClue: "",
+    hAnswer: {},
+    cardData: {}
 };
 let editKey = "";
+let extendOpen = false;
 
-// === 完整导入H01-H17全部17条风控规则（与表格一一对应） ===
 const riskRule = [
-    {
-        ruleId:"H01",
-        words:["押金","保证金","培训费","服装费","体检费","建档费"],
-        deny:["不收取","不收","无需","免除","无","不会收取"],
-        title:"发现入职前收费要求",
-        desc:"正规招聘一般不应以报名、入职、保密、服装、体检、押金或培训等名义先向求职者收钱。",
-        action:"暂停付款；索要收费主体、项目、金额、合同与发票；通过学校就业部门或单位官方渠道交叉核验。"
-    },
-    {
-        ruleId:"H02",
-        words:["培训贷","购车贷","分期购买","贷款上班","设备分期"],
-        deny:[],
-        title:"发现贷款或指定购买要求",
-        desc:"把工作机会与贷款、培训分期、购车、租车、设备或指定商品绑定，可能让求职者先承担债务或成本。",
-        action:"不要签贷款或分期；核验合同相对方、总成本与退出条件；向学校或金融机构官方客服求证。"
-    },
-    {
-        ruleId:"H03",
-        words:["私人转账","个人账户收款","微信转账","支付宝转账","个人银行卡收款"],
-        deny:[],
-        title:"发现向个人账户转账要求",
-        desc:"以入职、保证金、任务垫资等理由要求向个人银行卡、私人微信或支付宝转账，资金追溯和退款风险较高。",
-        action:"立即停止转账；保存聊天、账户、收款码与理由；通过单位官网公开电话核验。"
-    },
-    {
-        ruleId:"H04",
-        words:["陌生APP","屏幕共享","远程控制","远程桌面"],
-        deny:[],
-        title:"发现远程控制或陌生应用要求",
-        desc:"陌生App、屏幕共享和远程控制可能暴露验证码、支付信息、身份资料或设备控制权。",
-        action:"不要继续安装或授权；关闭屏幕共享和远程控制；仅通过官方应用商店与单位官方渠道核验。"
-    },
-    {
-        ruleId:"H05",
-        words:["索要银行卡","支付账户","电话卡","验证码","网银工具"],
-        deny:[],
-        title:"发现敏感账户或凭证要求",
-        desc:"银行卡、支付账户、电话卡、验证码、网银工具等可被用于资金转移或身份冒用，不应交由招聘方控制。",
-        action:"拒绝提供或出借；如已提供，立即联系银行/平台冻结或修改安全设置，并保留证据。"
-    },
-    {
-        ruleId:"H06",
-        words:["刷单","垫付资金","代收代付","跑分","不明转账"],
-        deny:[],
-        title:"发现资金或账户类可疑任务",
-        desc:"刷单、先垫资、代收代付、帮助转账或跑分并非正常实习任务，可能造成财产与法律风险。",
-        action:"停止操作和资金往来；保留任务说明与聊天记录；必要时联系学校、平台或公安机关咨询。"
-    },
-    {
-        ruleId:"H07",
-        words:["联系人不一致","虚假招聘","冒充公司","非官方联系方式"],
-        deny:[],
-        title:"发现招聘身份不一致",
-        desc:"招聘联系人、邮箱、电话、收款主体或面试地点与单位官网/官方电话核验结果不一致，存在冒名或信息失真的可能。",
-        action:"暂停提交材料和赴约；使用单位官网公开电话、学校就业平台、国家企业信用信息公示系统等独立渠道核验。"
-    },
-    {
-        ruleId:"H08",
-        words:["扣押身份证","扣留学生证","留存毕业证","保管证件原件"],
-        deny:[],
-        title:"发现扣留证件原件要求",
-        desc:"要求长期扣留身份证、学生证、毕业证等原件是重要警示，可能引发身份冒用或行动受限。",
-        action:"拒绝交付原件；确需核验时建议现场出示并注明复印件用途；向学校或单位官方渠道核实。"
-    },
-    {
-        ruleId:"H09",
-        words:["人脸识别","指纹采集","手持身份证照片","人脸核验"],
-        deny:[],
-        title:"发现敏感生物信息收集要求",
-        desc:"要求提供人脸识别、指纹、手持身份证照片等，超出普通招聘核验需要，可能被用于身份冒用、贷款或其他非法用途。",
-        action:"拒绝提供；如已提供，立即联系学校、平台或公安机关咨询，并保留要求截图。"
-    },
-    {
-        ruleId:"H10",
-        words:["空白文件","自愿放弃报酬","放弃实习证明","高额违约金","空白协议"],
-        deny:[],
-        title:"发现不公平签署要求",
-        desc:"要求签署空白文件、自愿放弃报酬或实习证明，或设置明显不合理的违约金、竞业限制，可能限制你的基本权利。",
-        action:"不签空白或不合理文件；要求提供完整文本并保留副本；向学校就业部门或法律咨询渠道求助。"
-    },
-    {
-        ruleId:"H11",
-        words:["社交账号密码","微信密码","QQ密码","微博密码","读取通讯录","读取相册","授权通讯录","授权相册"],
-        deny:[],
-        title:"发现社交账号控制要求",
-        desc:"要求提供微信、QQ、微博等社交账号密码，或授权读取通讯录、相册，可能导致隐私泄露或被用于诈骗。",
-        action:"拒绝提供；修改相关账号安全设置；保留要求记录。"
-    },
-    {
-        ruleId:"H12",
-        words:["退出收费","离职收费","违约金","押金","培训成本","缴纳费用才能退出","缴纳费用才能离职"],
-        deny:[],
-        title:"发现退出收费要求",
-        desc:"以“违约金”“押金”“培训成本”等名义，要求你先缴纳费用才能退出或离职，属于不合理收费。",
-        action:"拒绝支付；保留聊天记录；向学校就业中心或劳动监察部门咨询。"
-    },
-    {
-        ruleId:"H13",
-        words:["岗位不符","实际工作不符","挂羊头卖狗肉","招转培","培训上岗","先培训后上岗"],
-        deny:[],
-        title:"岗位描述与实际不符",
-        desc:"入职后实际工作内容、地点或薪酬与招聘时的承诺有明显差异，或要求先参加付费培训才能上岗，属于典型的“挂羊头卖狗肉”或“招转培”套路。",
-        action:"暂停入职；要求招聘方提供书面岗位说明并加盖公章；通过已入职员工或社交平台核实实际工作内容；向学校就业部门反馈。"
-    },
-    {
-        ruleId:"H14",
-        words:["霸王条款","竞业限制","高额违约金","无限期服务绑定","单方面解除权","不公平条款"],
-        deny:[],
-        title:"发现协议含霸王条款",
-        desc:"实习协议中包含过度宽泛的竞业限制、高额违约金、无限期服务绑定或单方面解除权等不公平条款，可能严重损害实习生合法权益。",
-        action:"暂停签署；逐条阅读协议条款并拍照留存；咨询学校法律顾问或就业指导中心；必要时拒绝签署。"
-    },
-    {
-        ruleId:"H15",
-        words:["名额有限","今天必须决定","赶紧决定","保密","不能告诉别人","紧迫","施压"],
-        deny:[],
-        title:"发现社交工程施压迹象",
-        desc:"沟通中感受到紧迫感施压（如“名额有限”“今天必须决定”）、被要求保密或隔离外界联系，属于常见的社交工程操控手段，旨在阻断理性思考。",
-        action:"暂停决策；告知家人或朋友面试情况；要求书面材料并在冷静后评估；必要时终止接触。"
-    },
-    {
-        ruleId:"H16",
-        words:["付费盖章","代开发票","保证通过学校审核","付费实习证明","购买实习证明"],
-        deny:[],
-        title:"发现付费获取实习证明要求",
-        desc:"招聘方以“付费盖章”“代开发票”“保证通过学校审核”等名义提供实习证明或学分认证服务，可能涉及虚假实习、伪造公章等违法行为。",
-        action:"拒绝付费获取实习证明；通过学校官方渠道确认实习认定流程；如发现伪造公章迹象，向学校保卫部门报告。"
-    },
-    {
-        ruleId:"H17",
-        words:["AI面试","虚拟面试","视频合成面试","声音克隆","深伪面试","纯视频面试","纯语音面试"],
-        deny:[],
-        title:"发现疑似AI伪造面试诈骗迹象",
-        desc:"面试为纯视频/语音且无法通过官方公开电话二次核验，或发现面试官为视频合成、声音克隆，属于利用AI技术实施的新型诈骗手段，用于获取面试者面部、声音以及其他个人信息。",
-        action:"暂停提交任何个人信息；通过单位官方公开电话（非招聘方提供的号码）进行人工核验；向学校或公安机关报告。"
-    }
+    {ruleId:"H01",question:"是否存在入职前收取押金、保证金、培训费、服装费、体检费、建档费的要求？",desc:"正规招聘一般不应以报名、入职、保密、服装、体检、押金或培训等名义先向求职者收钱。",action:"建议暂停付款；索要收费主体、项目、金额、合同与发票；通过学校就业部门或单位官方渠道交叉核验。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H02",question:"是否要求办理培训贷、购车贷、分期购买、贷款上班、设备分期？",desc:"把工作机会与贷款、培训分期、购车、租车、设备或指定商品绑定，可能让求职者先承担债务或成本。",action:"建议不要签署贷款或分期协议；核验合同主体、总成本与退出条款；向学校或金融机构官方客服求证。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H03",question:"是否要求向个人账户、私人微信/支付宝转账？",desc:"以入职、保证金、任务垫资等理由要求向个人银行卡、私人微信或支付宝转账，资金追溯和退款风险较高。",action:"建议立即停止转账；保存聊天记录、收款账户凭证；通过企业官网公开电话核验真实性。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H04",question:"是否要求安装陌生APP、开启屏幕共享或者远程控制设备？",desc:"陌生App、屏幕共享和远程控制可能暴露验证码、支付信息、身份资料或设备控制权。",action:"拒绝安装与授权；关闭远程控制权限；仅使用官方应用商店下载软件核验企业信息。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H05",question:"是否索要银行卡、支付账户、电话卡、验证码、网银工具交由对方保管？",desc:"银行卡、支付账户、电话卡、验证码、网银工具等可被用于资金转移或身份冒用，不应交由招聘方控制。",action:"拒绝提供账户凭证；若已提交，尽快联系平台冻结账号并留存沟通证据。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H06",question:"任务是否包含刷单、垫付资金、代收代付、跑分、不明转账操作？",desc:"刷单、先垫资、代收代付、帮助转账或跑分并非正常实习任务，可能造成财产与法律风险。",action:"停止所有资金操作；完整留存聊天记录；必要时咨询学校保卫部门或公安机关。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H07",question:"招聘联系人、电话、地点与企业官方信息不一致，疑似虚假或冒名招聘？",desc:"招聘联系人、邮箱、电话、收款主体或面试地点与单位官网核验结果不一致，存在冒名风险。",action:"暂停提交个人材料；使用国家企业信用信息公示系统独立核验企业资质。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H08",question:"要求扣押身份证、学生证、毕业证等证件原件？",desc:"要求长期扣留身份证、学生证、毕业证等原件是重要警示，可能引发身份冒用或行动受限。",action:"拒绝交付证件原件；核验仅出示复印件并标注使用用途，向学校就业中心反馈。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H09",question:"要求人脸识别、指纹采集、手持身份证拍照等敏感生物信息？",desc:"要求提供人脸识别、指纹、手持身份证照片等，超出普通招聘核验需要，可能被用于身份冒用。",action:"拒绝提交敏感生物信息；保留对方索要凭证，及时向学校咨询求助。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H10",question:"要求签署空白文件、放弃报酬/实习证明，或者约定高额不合理违约金？",desc:"要求签署空白文件、自愿放弃报酬或实习证明，或设置明显不合理的违约金、竞业限制，可能限制你的基本权利。",action:"拒绝签署空白协议；索要完整合同文本留存副本，咨询学校法务与就业指导中心。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H11",question:"索要社交账号密码，或者授权读取通讯录、相册权限？",desc:"要求提供微信、QQ、微博等社交账号密码，或授权读取通讯录、相册，可能导致隐私泄露或被用于诈骗。",action:"拒绝账号授权；修改社交账号安全密码，保存对方索取记录。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H12",question:"离职、退出需要缴纳违约金、押金、培训成本才能办理？",desc:"以违约金、押金、培训成本等名义，要求你先缴纳费用才能退出或离职，属于不合理收费。",action:"拒绝支付离职相关费用；保存聊天记录，向学校或劳动监察渠道咨询。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H13",question:"岗位描述与实际工作不一致，存在招转培、先付费培训再上岗？",desc:"入职后实际工作内容、地点或薪酬与招聘时的承诺有明显差异，或要求先参加付费培训才能上岗，属于典型的挂羊头卖狗肉或招转培套路。",action:"暂停入职流程；索要加盖公章的岗位说明书；向往届实习生核实真实工作内容。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H14",question:"协议包含过度竞业限制、高额违约金、不公平的霸王条款？",desc:"实习协议中包含过度宽泛的竞业限制、高额违约金、无限期服务绑定或单方面解除权等不公平条款，可能严重损害实习生合法权益。",action:"暂缓签署实习协议；逐条留存合同截图，咨询学校就业指导中心法律意见。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H15",question:"对方制造紧迫感施压，要求立即决定，或者要求保密不得告知他人？",desc:"沟通中感受到紧迫感施压（如名额有限、今天必须决定）、被要求保密或隔离外界联系，属于常见的社交工程操控手段，旨在阻断理性思考。",action:"暂缓决策；将招聘信息告知家人朋友；冷静评估后再确认是否接受岗位。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H16",question:"付费盖章、购买实习证明、付费保证学校审核通过？",desc:"招聘方以付费盖章、代开发票、保证通过学校审核等名义提供实习证明或学分认证服务，可能涉及虚假实习、伪造公章等违法行为。",action:"拒绝付费获取实习证明；严格按照学校官方流程完成实习认定。",link:"https://www.gsxt.gov.cn/"},
+    {ruleId:"H17",question:"面试为纯视频/语音，疑似AI深伪面试无法官方核验？",desc:"面试为纯视频/语音且无法通过官方公开电话二次核验，或发现面试官为视频合成、声音克隆，属于利用AI技术实施的新型诈骗手段，用于获取面试者面部、声音以及其他个人信息。",action:"停止提交个人信息；通过企业官方独立号码核验面试真实性，必要时上报学校。",link:"https://www.gsxt.gov.cn/"}
 ];
 
-const cardMeta = [
-    {key:"c01",title:"用人主体",tip:"单位全称 + 官方核验渠道"},
-    {key:"c02",title:"岗位职责",tip:"岗位名称 + 主要任务"},
-    {key:"c03",title:"工作地点",tip:"具体地址 / 远程安排"},
-    {key:"c04",title:"实习期限",tip:"开始 — 结束日期"},
-    {key:"c05",title:"出勤工时",tip:"每周天数 × 每日小时"},
-    {key:"c06",title:"报酬标准",tip:"金额 + 计量单位"},
-    {key:"c07",title:"结算安排",tip:"周期 + 支付方式 / 主体"},
-    {key:"c08",title:"带教考核",tip:"带教人/部门/反馈/考核"},
-    {key:"c09",title:"安全保障",tip:"培训/防护/保险/联系人"},
-    {key:"c10",title:"退出与证明",tip:"退出/结算/证明条件"}
-];
-
-function parseAutoFill(text){
-    let newFill = {};
-    let companyMatch = text.match(/([^，。；]*?(有限公司|文化传媒|科技公司|实业集团))/);
-    newFill.c01 = companyMatch ? companyMatch[1].trim() : "";
-
-    let jobMatch = text.match(/([^，。；]*?(实习生|助理|文员))/);
-    newFill.c02 = jobMatch ? jobMatch[1].trim() : "";
-
-    let addrMatch = text.match(/(.+市.+区.*?(大厦|园区|街道|写字楼))/);
-    newFill.c03 = addrMatch ? addrMatch[1].trim() : "";
-
-    let dateMatch = text.match(/(\d{4}-\d{1,2}-\d{1,2}).*?(\d{4}-\d{1,2}-\d{1,2})/);
-    newFill.c04 = dateMatch ? `${dateMatch[1]} 至 ${dateMatch[2]}` : "";
-
-    let workTime = text.match(/周一至周五.*?(\d{1,2}[:：]\d{2}).*?(\d{1,2}[:：]\d{2})/);
-    newFill.c05 = workTime ? `周一至周五 ${workTime[1]}-${workTime[2]}` : "";
-
-    let salaryMatch = text.match(/(\d+)元\/天/);
-    newFill.c06 = salaryMatch ? `${salaryMatch[1]}元/天实习补贴` : "";
-
-    newFill.c07 = text.includes("按月") || text.includes("月结") ? "按月对公转账发放" : "";
-    newFill.c08 = text.includes("带教老师") ? "配备专职带教老师，实习结束出具评价" : "";
-    newFill.c09 = text.includes("意外险") || text.includes("保险") ? "公司提供办公意外险，配备紧急联系人" : "";
-    newFill.c10 = text.includes("实习证明") ? "实习考核合格，可开具实习证明" : "";
-
-    for(let k in newFill){
-        if(!cardData[k]){
-            cardData[k] = newFill[k];
-        }
-    }
-    localStorage.setItem("contractCard",JSON.stringify(cardData));
-}
-
-function renderCard(){
-    let html = "";
-    cardMeta.forEach(item=>{
-        let val = cardData[item.key];
-        let showText = val || "<span class='card-empty'>⚠ 待点击补全信息</span>";
-        html += `<div class='contract-card' onclick='openEdit("${item.key}","${item.title}")'>
-            <div class='card-title'>${item.title}</div>
-            <div class='card-desc'>${showText}</div>
-        </div>`;
-    })
-    document.getElementById("contractWrap").innerHTML = html;
-    checkUnlock();
-}
-
-function checkNearDeny(fullText,hitWord,denyList){
-    let pos = fullText.indexOf(hitWord);
-    let start = Math.max(0,pos - 30);
-    let end = Math.min(fullText.length,pos + 30);
-    let sliceText = fullText.slice(start,end);
-    return denyList.some(word => sliceText.includes(word));
-}
-
-function checkUnlock(){
-    const allFilled = Object.values(cardData).some(v=>v.trim()!=='');
-    const btn = document.getElementById("enterWorkBtn");
-    if(allFilled) btn.classList.remove("hidden");
-    else btn.classList.add("hidden");
-}
-
-function checkRisk(){
-    let text = document.getElementById("jobText").value;
-    parseAutoFill(text);
-    let warnHtml = "";
-    let riskHtml = "";
-    let hitCount = 0;
-    riskRule.forEach(rule=>{
-        let hitWord = rule.words.find(w=>text.includes(w));
-        if(hitWord){
-            const hasNearDeny = checkNearDeny(text,hitWord,rule.deny);
-            if(!hasNearDeny){
-                hitCount++;
-                warnHtml = `<div class='danger-tip'>● 检测到${hitCount}条实习高危风险，请谨慎对待</div>`;
-                riskHtml += `<div class='risk-item'>
-                    <div class='risk-title'>${rule.ruleId}｜${rule.title}</div>
-                    <div class='risk-desc'>${rule.desc}</div>
-                    <div class='risk-suggest'>💡建议动作：${rule.action}</div>
-                </div>`;
-            }
-        }
-    })
-    if(hitCount === 0){
-        warnHtml = `<div class='danger-tip' style='background:#e8f5e9;color:#2e7d32;border-color:#66bb6a;'>✅ 未检测到高危风险，仍建议仔细核对岗位细节</div>`;
-    }
-    document.getElementById("warnBox").innerHTML = warnHtml;
-    document.getElementById("riskList").innerHTML = riskHtml;
-    renderCard();
-}
-
-function openEdit(key,title){
-    editKey = key;
-    document.getElementById("modalTitle").textContent = `编辑${title}`;
-    document.getElementById("modalInput").value = cardData[key] || "";
-    document.getElementById("editModal").style.display = "flex";
-}
-
-function closeModal(){
-    document.getElementById("editModal").style.display = "none";
-}
-
-function saveCard(){
-    cardData[editKey] = document.getElementById("modalInput").value.trim();
-    localStorage.setItem("contractCard",JSON.stringify(cardData));
-    closeModal();
-    renderCard();
-}
-
-function showInternPanel(){
-    document.getElementById("internPanel").style.display = "block";
-}
-
-// 截图OCR识别
-document.getElementById('imgFile').addEventListener('change', async function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    alert('正在识别图片文字，请稍候...');
-    const worker = await Tesseract.createWorker('chi_sim', 1);
-    const ret = await worker.recognize(file);
-    document.getElementById('jobText').value = ret.data.text;
-    await worker.terminate();
-    alert('文字识别完成！');
+riskRule.forEach(item => {
+    flowData.hAnswer[item.ruleId] = "u";
 });
 
-// PDF导出功能
-function exportPdf(){
-    const text = document.getElementById("jobText").value;
-    if(!text){
-        alert("请先粘贴岗位描述并生成评估");
-        return;
-    }
-    // 填充PDF内容
-    let pdfContent = `<h1>实习风险评估报告</h1>`;
-    pdfContent += `<h3>岗位原始描述</h3><p>${text.replace(/\n/g,'<br>')}</p>`;
-    pdfContent += `<h3>风险检测结果</h3>`;
-    const riskItems = document.querySelectorAll('.risk-item');
-    if(riskItems.length === 0){
-        pdfContent += `<p>✅ 未检测到高危风险</p>`;
-    } else {
-        riskItems.forEach(item=>{
-            pdfContent += item.innerHTML;
-        });
-    }
-    pdfContent += `<h3>实习核心信息卡片</h3>`;
-    cardMeta.forEach(item=>{
-        pdfContent += `<p><strong>${item.title}：</strong>${cardData[item.key] || '未填写'}</p>`;
-    });
-    
-    document.getElementById('pdfDom').innerHTML = pdfContent;
-    const element = document.getElementById('pdfDom');
-    html2pdf().set({
-        margin: 10,
-        filename: '实习风险评估报告.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(element).save();
+const cardMeta = [
+    {key:"c01",title:"用人主体",tip:"单位全称 + 官方核验渠道",type:"core"},
+    {key:"c02",title:"岗位职责",tip:"岗位名称 + 主要任务",type:"core"},
+    {key:"c03",title:"工作地点",tip:"具体地址 / 远程安排",type:"core"},
+    {key:"c04",title:"实习期限",tip:"开始 — 结束日期",type:"core"},
+    {key:"c05",title:"出勤工时",tip:"每周天数 × 每日小时",type:"core"},
+    {key:"c06",title:"报酬标准",tip:"金额 + 计量单位",type:"core"},
+    {key:"c07",title:"结算安排",tip:"周期 + 支付方式 / 主体",type:"core"},
+    {key:"c08",title:"带教考核",tip:"带教人/部门/反馈/考核",type:"core"},
+    {key:"c09",title:"安全保障",tip:"培训/防护/保险/联系人",type:"core"},
+    {key:"c10",title:"退出与证明",tip:"退出/结算/证明条件",type:"core"},
+    {key:"c11",title:"实习协议形式",tip:"书面协议/电子协议/无协议",type:"extend"},
+    {key:"c12",title:"考勤与打卡方式",tip:"确认考勤工具（APP/指纹）、打卡时间、忘打卡补救流程",type:"extend"},
+    {key:"c13",title:"汇报关系与层级",tip:"直属带教姓名岗位、是否存在虚线汇报对象",type:"extend"},
+    {key:"c14",title:"核心交付物",tip:"实习结束需要提交的成果：报告/代码/设计图/文档等",type:"extend"},
+    {key:"c15",title:"保密与竞业限制",tip:"是否签署保密协议、保密范围、离职脱密期要求",type:"extend"},
+    {key:"c16",title:"培训与入职指引",tip:"入职文档安排、新人培训、导师见面计划",type:"extend"},
+    {key:"c17",title:"转正/留用机会",tip:"是否提供转正名额、考核标准与评审流程",type:"extend"},
+    {key:"c18",title:"食宿与交通补贴",tip:"宿舍/房补、食堂福利、交通通讯报销政策",type:"extend"},
+    {key:"c19",title:"加班与调休规则",tip:"加班补贴、调休机制、加班申请审批流程",type:"extend"},
+    {key:"c20",title:"知识产权归属",tip:"产出物版权归属，是否允许放入个人作品集",type:"extend"}
+];
+
+cardMeta.forEach(item => {
+    flowData.cardData[item.key] = "";
+});
+
+function escapeHtml(str) {
+    if (!str) return "";
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
 }
 
-// 初始化渲染
-renderCard();
+function toggleExtend(){
+    extendOpen = !extendOpen;
+    const wrap = document.getElementById("extendCardWrap");
+    const icon = document.getElementById("foldIcon");
+    if(extendOpen){
+        wrap.classList.add("open");
+        icon.innerText = "▲ 点击收起";
+    }else{
+        wrap.classList.remove("open");
+        icon.innerText = "▼ 点击展开";
+    }
+}
+
+function hideAllStep() {
+    ["step1","step2","step3","step4","step5"].forEach(id => {
+        document.getElementById(id).style.display = "none";
+    });
+}
+function startFlow() {
+    hideAllStep();
+    document.getElementById("step1").style.display = "block";
+}
+function goStep1() {
+    hideAllStep();
+    document.getElementById("step1").style.display = "block";
+}
+
+document.getElementById("jobText").addEventListener("input", function() {
+    if (flowData.originalRaw && this.value !== flowData.originalRaw) {
+        document.getElementById("changeWarn").classList.remove("hidden");
+    } else {
+        document.getElementById("changeWarn").classList.add("hidden");
+    }
+});
+
+function goStep2() {
+    let inputVal = document.getElementById("jobText").value.trim();
+    if (!inputVal) {
+        alert("请先粘贴或识别岗位文本，才可继续评估");
+        return;
+    }
+    hideAllStep();
+    flowData.rawText = inputVal;
+    flowData.originalRaw = inputVal;
+
+    let clues = [];
+    riskRule.forEach(r => {
+        let keywordList = r.question.split(/[，、？]/);
+        keywordList.forEach(w => {
+            if (inputVal.includes(w) && w.length > 1) clues.push(w);
+        });
+    });
+    flowData.extractClue = clues.length ? [...new Set(clues)].join("、") : "未识别到可疑关键词线索";
+    document.getElementById("extractContent").textContent = flowData.extractClue;
+    document.getElementById("step2").style.display = "block";
+}
+
+function goStep3() {
+    hideAllStep();
+    let html = "";
+    riskRule.forEach(item => {
+        let aid = item.ruleId;
+        let sel = flowData.hAnswer[aid];
+        html += `<div class="risk-question">
+            <div class="q-title">${escapeHtml(aid)} ${escapeHtml(item.question)}</div>
+            <div class="opt-group">
+                <button class="opt-btn y ${sel==='y'?'active':''}" onclick="setAnswer('${aid}','y')">是</button>
+                <button class="opt-btn n ${sel==='n'?'active':''}" onclick="setAnswer('${aid}','n')">否</button>
+                <button class="opt-btn u ${sel==='u'?'active':''}" onclick="setAnswer('${aid}','u')">不确定</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById("questionWrap").innerHTML = html;
+    document.getElementById("step3").style.display = "block";
+}
+window.setAnswer = function(id, val) {
+    flowData.hAnswer[id] = val;
+    goStep3();
+};
+
+function goStep4() {
+    hideAllStep();
+    renderCard();
+    document.getElementById("step4").style.display = "block";
+}
+
+function renderCard() {
+    let coreHtml = "";
+    let extHtml = "";
+    cardMeta.forEach(item => {
+        let val = flowData.cardData[item.key];
+        let tagMark = item.type === "core"
+            ? '<span class="core-tag">核心项</span>'
+            : '<span class="ext-tag">扩展项</span>';
+        let showText = val
+            ? escapeHtml(val)
+            : "<span class='card-empty'>⚠ 待点击补全信息</span>";
+        let card = `<div class='contract-card' onclick='openEdit("${item.key}","${escapeHtml(item.title)}")'>
+            <div class='card-title'>${tagMark}${escapeHtml(item.title)}</div>
+            <div class='card-desc'>${showText}</div>
+        </div>`;
+        if(item.type === "core") coreHtml += card;
+        else extHtml += card;
+    });
+    document.getElementById("coreCardWrap").innerHTML = coreHtml;
+    document.getElementById("extendCardWrap").innerHTML = extHtml;
+}
+
+window.openEdit = function(key, title) {
+    editKey = key;
+    document.getElementById("modalTitle").textContent = "编辑" + title;
+    document.getElementById("modalInput").value = flowData.cardData[key] || "";
+    document.getElementById("editModal").style.display = "flex";
+};
+window.closeModal = function() {
+    document.getElementById("editModal").style.display = "none";
+};
+window.saveCard = function() {
+    flowData.cardData[editKey] = document.getElementById("modalInput").value.trim();
+    closeModal();
+    renderCard();
+};
+
+function buildFinalReport() {
+    hideAllStep();
+
+    let hitList = riskRule.filter(r => flowData.hAnswer[r.ruleId] === "y");
+    let pendingList = riskRule.filter(r => flowData.hAnswer[r.ruleId] === "u");
+
+    let filledCount = Object.values(flowData.cardData).filter(v => v.trim() !== "").length;
+    let totalC = cardMeta.length;
+    let coreList = cardMeta.filter(i => i.type === "core");
+    let filledCore = coreList.filter(item => flowData.cardData[item.key].trim() !== "").length;
+    let totalCore = coreList.length;
+
+    let alertHtml = "";
+    if (hitList.length > 0) {
+        alertHtml = `<div class='danger-tip'>⚠️ 报告结论：检出${hitList.length}项高风险，建议暂停相关操作并进一步核验</div>`;
+    } else if (pendingList.length > 0) {
+        alertHtml = `<div class='wait-tip'>🟡 报告结论：尚有高风险事项未确认，请完成全部信息核验</div>`;
+    } else if (filledCount < totalC) {
+        alertHtml = `<div class='wait-tip'>🟡 报告结论：未发现已确认的高风险信号，仍有若干约定待补充</div>`;
+    } else {
+        alertHtml = `<div class='safe-tip'>✅ 报告结论：未发现已确认的高风险信号，信息相对完整，不代表安全认证</div>`;
+    }
+    document.getElementById("finalAlert").innerHTML = alertHtml;
+
+    let hitHtml = hitList.length === 0
+        ? "<p>无命中高风险项</p>"
+        : hitList.map(i => `
+            <div class='risk-item'>
+                <strong>${escapeHtml(i.ruleId)}</strong> ${escapeHtml(i.question)}<br/>
+                <span>依据来源：岗位原始描述人工核验</span>｜
+                <a href="${escapeHtml(i.link)}" target="_blank">核验企业信息</a>
+                <br/>建议动作：${escapeHtml(i.action)}
+            </div>`).join("");
+    document.getElementById("hitRiskList").innerHTML = hitHtml;
+
+    let pendHtml = pendingList.length === 0
+        ? "<p>无不确定待核验条目</p>"
+        : pendingList.map(i => `
+            <div class='pending-item'>
+                <strong>${escapeHtml(i.ruleId)}</strong> ${escapeHtml(i.question)}<br/>
+                <span>依据来源：岗位原始描述人工核验</span>｜
+                <a href="${escapeHtml(i.link)}" target="_blank">核验企业信息</a>
+                <br/>建议动作：${escapeHtml(i.action)}
+            </div>`).join("");
+    document.getElementById("pendingList").innerHTML = pendHtml;
+
+    let cRate = (filledCount / totalC * 100).toFixed(0);
+    let coreRate = (filledCore / totalCore * 100).toFixed(0);
+    let cHtml = `<p>全部协议约定完整度：${filledCount}/${totalC}（${cRate}%）</p>`;
+    cHtml += `<p>核心必填项完整度：${filledCore}/${totalCore}（${coreRate}%）</p>`;
+    cHtml += filledCount < totalC
+        ? `<p style="color:#e65100;">存在未补全的协议卡片，请返回编辑完善</p>`
+        : `<p style="color:#10b981;">全部协议信息填写完成</p>`;
+    document.getElementById("cCheckResult").innerHTML = cHtml;
+
+    let allAction = [...hitList, ...pendingList].map(x => `<li>${escapeHtml(x.action)}</li>`);
+    let actHtml = allAction.length > 0
+        ? `<ul>${allAction.join("")}</ul>`
+        : "<li>保存岗位资料，保留聊天与合同文件，完成入职前自主核验</li>";
+    document.getElementById("actionList").innerHTML = actHtml;
+
+    document.getElementById("pdfExportBtn").disabled = false;
+    document.getElementById("step5").style.display = "block";
+}
+
+document.getElementById("imgFile").addEventListener("change", async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    alert("正在识别图片文字，请稍候...");
+    const worker = await Tesseract.createWorker("chi_sim", 1);
+    const ret = await worker.recognize(file);
+    document.getElementById("jobText").value = ret.data.text;
+    await worker.terminate();
+    alert("文字识别完成！");
+});
+
+function exportPdf() {
+    const element = document.getElementById("step5");
+    document.getElementById("pdfDom").innerHTML = element.innerHTML;
+    html2pdf().set({
+        margin: 10,
+        filename: "实习风险评估报告.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    }).from(document.getElementById("pdfDom")).save();
+}
+
+function resetAll() {
+    riskRule.forEach(item => {
+        flowData.hAnswer[item.ruleId] = "u";
+    });
+    document.getElementById("jobText").value = "";
+    flowData.rawText = "";
+    flowData.originalRaw = "";
+    document.getElementById("pdfExportBtn").disabled = true;
+    document.getElementById("changeWarn").classList.add("hidden");
+    extendOpen = false;
+    hideAllStep();
+}
+
+function clearAllData() {
+    localStorage.clear();
+    riskRule.forEach(item => {
+        flowData.hAnswer[item.ruleId] = "u";
+    });
+    cardMeta.forEach(item => {
+        flowData.cardData[item.key] = "";
+    });
+    document.getElementById("jobText").value = "";
+    flowData.rawText = "";
+    flowData.originalRaw = "";
+    document.getElementById("pdfExportBtn").disabled = true;
+    document.getElementById("changeWarn").classList.add("hidden");
+    extendOpen = false;
+    alert("所有本地数据已清空");
+    hideAllStep();
+}
 </script>
 </body>
 </html>
