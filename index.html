@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实习有约 | 大学生实习风险体检</title>
     <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -168,6 +169,11 @@
         }
         .expand-content.show{
             display:block;
+        }
+        .report-item{
+            padding:8px 0;
+            border-bottom:1px solid #efefef;
+            line-height:1.7;
         }
         @media print{
             .no-print{display:none !important;}
@@ -557,20 +563,32 @@ function openEditModal(key){
 }
 
 document.getElementById("cancelEdit").onclick = ()=>modal.style.display="none";
-//卡片保存校验逻辑
+
+//【修复后的保存校验逻辑】
 document.getElementById("saveEdit").onclick = function(){
     const cfg = cRawList.find(x=>x.key===currentEditKey);
     const obj = formData.cCard[currentEditKey];
-    const st = document.getElementById("cardStatus").value;
+    const st = document.getElementById("cardStatus").value.trim();
     const cnt = document.getElementById("cardContent").value.trim();
     const srcType = document.getElementById("cardSourceType").value.trim();
     const confirmUser = document.getElementById("cardConfirmBy").value.trim();
+    const naReasonVal = document.getElementById("cardNaReason").value.trim();
+
+    //规则1：状态=已确认，三项不能为空
     if(st === "confirm"){
         if(!cnt || !srcType || !confirmUser){
-            alert("标记为已确认时，必须填写具体内容、信息来源与确认方");
+            alert("标记为【已确认】时，必须填写具体内容、信息来源与确认方");
             return;
         }
     }
+    //规则2：状态=不适用，不适用原因不能为空
+    if(st === "na"){
+        if(!naReasonVal){
+            alert("选择【不适用】必须填写不适用原因！");
+            return;
+        }
+    }
+
     obj.status = st;
     obj.content = document.getElementById("cardContent").value;
     obj.contentType = document.getElementById("cardSourceType").value;
@@ -620,7 +638,45 @@ document.getElementById("calcResultBtn").onclick = function(){
     const res = calcRiskResult();
     const wrap = document.getElementById("resultWrap");
     wrap.innerHTML = `<div class="result-block ${res.level}">${res.text}</div>`;
+
+    //拼接中文完整确认卡内容
+    let reportHtml = "<h4>核心实习约定卡片详情</h4>";
+    cRawList.filter(item=>item.core).forEach(card=>{
+        const d = formData.cCard[card.key];
+        const statusText = statusMap[d.status];
+        const showContent = d.content || "无";
+        const sourceText = d.contentType || "协议";
+        const confirmPerson = d.confirmBy || "—";
+        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}</div>`;
+    });
+
+    reportHtml += "<br><h4>拓展补充约定卡片详情</h4>";
+    cRawList.filter(item=>!item.core).forEach(card=>{
+        const d = formData.cCard[card.key];
+        const statusText = statusMap[d.status];
+        const showContent = d.content || "无";
+        const sourceText = d.contentType || "协议";
+        const confirmPerson = d.confirmBy || "—";
+        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}</div>`;
+    });
+
+    document.getElementById("reportContent").innerHTML = reportHtml;
+    //HR话术
+    document.getElementById("confirmMsg").innerText = `您好，针对本次实习，我方确认以下实习约定，请核对：企业【${formData.companyName}】岗位【${formData.postName}】，请书面确认实习薪资、工时、休息、补贴等全部实习条款。`;
+
     document.getElementById("reportArea").classList.remove("report-hidden");
+}
+
+//导出PDF
+document.getElementById("exportPdfBtn").onclick = function(){
+    const printDom = document.getElementById("reportArea");
+    html2pdf().set({
+        margin:12,
+        filename:'实习风险评估报告.pdf',
+        image:{type:'jpeg',quality:0.98},
+        html2canvas:{scale:2},
+        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+    }).from(printDom).save();
 }
 
 //OCR识图简易逻辑（本地前端识别）
