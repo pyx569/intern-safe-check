@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实习有约 | 大学生实习风险体检</title>
     <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -257,7 +256,7 @@
             </div>
         </div>
         <div class="no-print" style="text-align:center;margin-bottom:30px;">
-            <button class="btn btn-primary" id="exportPdfBtn">一键导出PDF报告</button>
+            <button class="btn btn-primary" id="exportPdfBtn">打印 / 保存为PDF</button>
             <button class="btn" id="saveRecordBtn">保存本次评估到工作台</button>
         </div>
     </div>
@@ -602,12 +601,9 @@ document.getElementById("calcResultBtn").onclick = function(){
     document.getElementById("reportArea").classList.remove("report-hidden");
 };
 
+//调用浏览器原生打印（系统弹窗保存PDF）
 document.getElementById("exportPdfBtn").onclick = function(){
-    const printDom = document.getElementById("reportArea");
-    html2pdf().set({
-        margin:12,filename:'实习风险评估报告.pdf',image:{type:'jpeg',quality:0.98},
-        html2canvas:{scale:2},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-    }).from(printDom).save();
+    window.print();
 };
 
 document.getElementById("saveRecordBtn").onclick = function(){
