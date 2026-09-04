@@ -3,57 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>补充实习约定信息</title>
+    <title>快捷录入｜实习有约</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
-        body{background:#f5f7fa;padding:30px 16px;max-width:700px;margin:0 auto;}
-        .box{background:#fff;padding:26px;border-radius:14px;box-shadow:0 3px 14px #00000012;}
-        h2{margin-bottom:18px;color:#2c3e50;}
-        textarea{width:100%;min-height:160px;padding:14px;border:1px solid #dde2e8;border-radius:10px;font-size:15px;resize:vertical;margin-bottom:20px;}
-        .btn-row{display:flex;gap:12px;}
-        button{flex:1;padding:12px;border:none;border-radius:8px;color:#fff;font-size:15px;cursor:pointer;}
-        .save{background:#27ae60;}
-        .back{background:#95a5a6;}
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei";}
+        body{padding:40px 20px;}
+        .container{max-width:800px;margin:0 auto;}
+        .box{margin-bottom:16px;}
+        input,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;}
+        .btn{padding:8px 16px;background:#1677ff;color:#fff;border:none;border-radius:6px;cursor:pointer;}
     </style>
 </head>
 <body>
-<div class="box">
-    <h2 id="titleBlock"></h2>
-    <textarea id="fillArea" placeholder="在此填写完整约定信息"></textarea>
-    <div class="btn-row">
-        <button class="save" onclick="saveAndBack()">保存并返回评估页</button>
-        <button class="back" onclick="history.back()">取消返回</button>
+<div class="container">
+    <h1>快捷录入岗位信息</h1>
+    <div class="box">
+        <label>企业全称</label>
+        <input id="quickCompany">
     </div>
+    <div class="box">
+        <label>实习岗位名称</label>
+        <input id="quickPost">
+    </div>
+    <div class="box">
+        <label>岗位完整描述</label>
+        <textarea id="quickText" rows="8"></textarea>
+    </div>
+    <button class="btn" id="goMain">前往风险评估页面填充内容</button>
+    <div style="margin-top:12px;"><a href=" ">返回首页</a ></div>
 </div>
-
 <script>
-function getUrlParam(name){
-    const p = new URLSearchParams(location.search);
-    return p.get(name);
+document.getElementById("goMain").onclick = function(){
+    const data = {
+        companyName:document.getElementById("quickCompany").value,
+        postName:document.getElementById("quickPost").value,
+        jobText:document.getElementById("quickText").value
+    }
+    sessionStorage.setItem("quickFill",JSON.stringify(data));
+    window.location.href="index.html";
 }
-const cid = getUrlParam("id");
-const contractList = [
-    {cid:"C01",name:"用人主体｜单位全称 + 官方核验渠道"},
-    {cid:"C02",name:"岗位职责｜岗位名称 + 主要任务"},
-    {cid:"C03",name:"工作地点｜具体地址 / 远程安排"},
-    {cid:"C04",name:"实习期限｜开始 — 结束日期"},
-    {cid:"C05",name:"出勤工时｜每周天数 × 每日小时"},
-    {cid:"C06",name:"报酬标准｜金额 + 计量单位"},
-    {cid:"C07",name:"结算安排｜周期 + 支付方式 / 主体"},
-    {cid:"C08",name:"带教考核｜带教人/部门/反馈/考核"},
-    {cid:"C09",name:"安全保障｜培训/防护/保险/联系人"},
-    {cid:"C10",name:"退出与证明｜退出/结算/证明条件"}
-];
-const target = contractList.find(x=>x.cid===cid);
-document.getElementById("titleBlock").innerText = target.name;
-let store = JSON.parse(localStorage.getItem("internFill"))||{};
-document.getElementById("fillArea").value = store[cid]||"";
-
-function saveAndBack(){
-    store[cid] = document.getElementById("fillArea").value.trim();
-    localStorage.setItem("internFill",JSON.stringify(store));
-    window.location.href = "index.html";
-}
+//index.html补充读取sessionStorage回填逻辑，已预留兼容入口
 </script>
 </body>
 </html>
