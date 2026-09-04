@@ -1,227 +1,599 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>实习岗位风险评估｜实习有约</title>
-<script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
-body{padding:30px 20px;background:#f5f7fa;max-width:1100px;margin:0 auto;}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
-h1{font-size:26px;color:#222;}
-.btn{padding:9px 16px;border:none;border-radius:8px;cursor:pointer;font-size:14px;}
-.btn-blue{background:#1677ff;color:#fff;}
-.btn-gray{background:#94a3b8;color:#fff;}
-.btn-green{background:#27ae60;color:#fff;}
-.card{background:#fff;padding:24px;border-radius:12px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
-.card h3{margin-bottom:14px;color:#333;}
-.form-line{margin-bottom:16px;}
-.form-line label{display:block;margin-bottom:6px;font-weight:500;color:#444;}
-.form-line input,.form-line textarea{width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;}
-textarea{min-height:120px;resize:vertical;}
-.ocr-area{margin:12px 0;}
-.risk-item{padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
-.report-box{margin-top:20px;padding:20px;border:1px solid #ddd;background:#fff;border-radius:10px;display:none;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实习有约 | 大学生实习风险体检</title>
+    <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #ffffff;
+            padding: 40px 20px;
+            color:#333;
+        }
+        .container{
+            max-width:1100px;
+            margin:0 auto;
+        }
+        .header-bar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+        }
+        .btn{
+            padding:8px 16px;
+            border-radius:6px;
+            border:none;
+            cursor:pointer;
+            font-size:14px;
+        }
+        .btn-primary{
+            background:#1677ff;
+            color:#fff;
+        }
+        .btn-warning{
+            background:#faad14;
+            color:#fff;
+        }
+        .btn-danger{
+            background:#ff4d4f;
+            color:#fff;
+        }
+        .btn-success{
+            background:#52c41a;
+            color:#fff;
+        }
+        .section{
+            margin-bottom:32px;
+            border:1px solid #eee;
+            border-radius:10px;
+            padding:24px;
+        }
+        .section-title{
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:16px;
+        }
+        textarea,input{
+            width:100%;
+            border:1px solid #d9d9d9;
+            border-radius:6px;
+            padding:10px;
+            font-size:14px;
+        }
+        .card-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+            gap:16px;
+            margin-top:16px;
+        }
+        .c-card{
+            border-radius:8px;
+            padding:14px;
+            border:1px solid #ddd;
+            cursor:pointer;
+        }
+        .status-clear{background:#fff;border-color:#ccc;}
+        .status-pending{background:#fffbe6;border-color:#ffe58f;}
+        .status-confirm{background:#f6ffed;border-color:#b7eb8f;}
+        .status-na{background:#f5f5f5;border-color:#d9d9d9;color:#666;}
+        .result-block{
+            padding:20px;
+            border-radius:8px;
+            margin:20px 0;
+        }
+        .red{background:#fff1f0;border:1px solid #ffa39e;}
+        .yellow{background:#fffbe6;border:1px solid #ffe58f;}
+        .green{background:#f6ffed;border:1px solid #b7eb8f;}
+        .modal{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.4);
+            align-items:center;
+            justify-content:center;
+            z-index:999;
+        }
+        .modal-box{
+            background:#fff;
+            padding:24px;
+            border-radius:10px;
+            width:90%;
+            max-width:520px;
+        }
+        .report-hidden{
+            display:none;
+        }
+        .h-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:14px 0;
+            border-bottom:1px solid #eee;
+            gap:20px;
+        }
+        .h-text{
+            flex:1;
+            line-height:1.6;
+        }
+        .h-radio-group{
+            flex-shrink:0;
+            white-space:nowrap;
+            display:flex;
+            gap:14px;
+            align-items:center;
+        }
+        .h-radio-group label{
+            display:flex;
+            align-items:center;
+            gap:4px;
+            cursor:pointer;
+        }
+        .h-radio-group input[type="radio"]{
+            width:auto;
+            margin:0;
+        }
+        .input-row{
+            display:flex;
+            gap:16px;
+            flex-wrap:wrap;
+            align-items:center;
+            margin-top:10px;
+        }
+        .input-item{
+            flex:1;
+            min-width:200px;
+        }
+        .expand-wrap{
+            margin-top:20px;
+        }
+        .expand-btn-area{
+            text-align:center;
+            margin-top:18px;
+        }
+        .expand-content{
+            display:none;
+            margin-top:16px;
+        }
+        .expand-content.show{
+            display:block;
+        }
+        @media print{
+            .no-print{display:none !important;}
+        }
+    </style>
 </head>
 <body>
-<div class="top-bar">
-    <h1>实习风险评估</h1>
-    <div style="display:flex;gap:10px;">
-        <button class="btn btn-gray" onclick="window.location.href='intern.html'">返回工作台</button>
-        <button class="btn btn-gray" onclick="window.location.href='fill.html'">快捷录入</button>
+<div class="container">
+    <div class="header-bar">
+        <h1>实习有约｜大学生实习风险体检</h1>
+        <div>
+            <a href="intern.html"><button class="btn">我的工作台</button></a>
+            <a href="fill.html"><button class="btn btn-primary">快捷录入</button></a>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">第一步：填写/识别岗位招聘信息</div>
+        <textarea id="jobText" rows="6" placeholder="粘贴岗位描述，或者上传截图自动识别"></textarea>
+        <div style="margin:12px 0;">
+            <input type="file" id="ocrFile" accept="image/*">
+            <button class="btn btn-warning" id="ocrBtn">开始识图提取文字</button>
+            <span id="ocrTip"></span>
+        </div>
+        <div class="input-row">
+            <div class="input-item">
+                <label>单位全称：</label>
+                <input id="companyName" placeholder="填写企业完整名称">
+            </div>
+            <div class="input-item">
+                <label>岗位名称：</label>
+                <input id="postName" placeholder="填写实习岗位">
+            </div>
+            <div style="margin-top:22px">
+                <button class="btn btn-primary" id="checkCompanyBtn">一键工商核验</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">第二步：17项实习风险人工核验</div>
+        <div id="hList"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">第三步：实习约定信息核验卡片（点击卡片编辑详情）</div>
+        <div id="coreCardWrap" class="card-grid"></div>
+
+        <div class="expand-btn-area no-print">
+            <button class="btn" id="toggleExpandBtn">展开拓展约定项</button>
+        </div>
+
+        <div class="expand-content" id="expandPanel">
+            <p style="margin:12px 0;color:#666;">拓展补充约定（可选核验项）</p>
+            <div id="expandCardWrap" class="card-grid"></div>
+        </div>
+    </div>
+
+    <div style="text-align:center;margin:20px 0;">
+        <button class="btn btn-success" id="calcResultBtn">生成风险评估报告</button>
+    </div>
+
+    <div id="resultWrap"></div>
+
+    <div id="reportArea" class="report-hidden">
+        <div class="section">
+            <div class="section-title">📄实习约定确认卡</div>
+            <div id="reportContent"></div>
+            <div style="margin-top:20px;">
+                <h4>发给HR确认话术预览：</h4>
+                <p id="confirmMsg" style="background:#f5f5f5;padding:12px;border-radius:6px;"></p>
+            </div>
+            <div style="margin-top:24px;color:#666;font-size:13px;border-top:1px solid #eee;padding-top:16px;">
+                <strong>免责声明：</strong>本工具提供的内容仅作为实习参考，不替代劳动合同、实习协议或法律意见。评估结果不构成安全认证，不代表企业承诺。
+            </div>
+        </div>
+        <div class="no-print" style="text-align:center;margin-bottom:30px;">
+            <button class="btn btn-primary" id="exportPdfBtn">一键导出PDF报告</button>
+            <button class="btn" id="saveRecordBtn">保存本次评估到工作台</button>
+        </div>
     </div>
 </div>
 
-<div class="card">
-    <h3>基础信息填写</h3>
-    <div class="form-line">
-        <label>企业名称</label>
-        <input id="companyName">
+<div class="modal" id="editModal">
+    <div class="modal-box">
+        <h3 id="modalTitle">编辑卡片信息</h3>
+        <div style="margin:10px 0;">
+            <label>状态</label>
+            <select id="cardStatus" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:6px;">
+                <option value="clear">待填写</option>
+                <option value="pending">待确认</option>
+                <option value="confirm">已确认</option>
+                <option id="naOption" value="na">不适用</option>
+            </select>
+        </div>
+        <div style="margin:10px 0;">
+            <label>填写内容</label>
+            <textarea id="cardContent" rows="3"></textarea>
+        </div>
+        <div style="margin:10px 0;">
+            <label>信息来源类型</label>
+            <select id="cardSourceType" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:6px;">
+                <option value="协议">协议</option>
+                <option value="聊天记录">聊天记录</option>
+                <option value="公告">公告</option>
+                <option value="口头告知">口头告知</option>
+                <option value="其他">其他</option>
+            </select>
+        </div>
+        <div style="margin:10px 0;">
+            <label>来源备注</label>
+            <input id="cardSourceNote">
+        </div>
+        <div style="margin:10px 0;">
+            <label>确认方</label>
+            <input id="cardConfirmBy">
+        </div>
+        <div id="naReasonWrap" style="margin:10px 0;display:none;">
+            <label>不适用原因（选「不适用」必填）</label>
+            <textarea id="cardNaReason" rows="2"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+            <button class="btn" id="cancelEdit">取消</button>
+            <button class="btn btn-primary" id="saveEdit">保存</button>
+        </div>
     </div>
-    <div class="form-line">
-        <label>实习岗位</label>
-        <input id="postName">
-    </div>
-    <div class="form-line">
-        <label>薪资结算方式</label>
-        <input id="salaryRule">
-    </div>
-    <div class="form-line">
-        <label>住宿福利安排</label>
-        <input id="liveRule">
-    </div>
-    <div class="form-line">
-        <label>工作时间约定</label>
-        <input id="timeRule">
-    </div>
-    <div class="ocr-area">
-        <label>上传岗位截图识别文字（可选）</label>
-        <input type="file" accept="image/*" id="imgUpload">
-        <p style="font-size:12px;color:#888;margin-top:4px;">识别失败请手动填写全部信息</p>
-    </div>
-</div>
-
-<div class="card">
-    <h3>风险核验清单</h3>
-    <div id="riskWrap"></div>
-</div>
-
-<div style="display:flex;gap:12px;margin:20px 0;">
-    <button class="btn btn-blue" onclick="calcRisk()">生成风险评估报告</button>
-    <button class="btn btn-green" onclick="saveRecord()">保存评估至工作台</button>
-    <button class="btn btn-gray" onclick="exportPdf()">导出PDF报告</button>
-</div>
-
-<div class="report-box" id="reportBox">
-    <h2>实习岗位风险评估报告</h2>
-    <div id="reportContent"></div>
 </div>
 
 <script>
-// 风险规则库
-const riskList = [
-    {title:"是否要求缴纳押金、培训费",ans:"u"},
-    {title:"是否要求垫付资金",ans:"u"},
-    {title:"薪资低于当地最低实习补贴标准",ans:"u"},
-    {title:"不签订实习协议/劳务合同",ans:"u"},
-    {title:"强制加班且无补贴",ans:"u"}
-];
+let currentEditKey = "";
+let expandOpened = false;
 let formData = {
-    companyName:"",postName:"",salaryRule:"",liveRule:"",timeRule:"",
-    hRule:JSON.parse(JSON.stringify(riskList))
+    companyName:"",
+    postName:"",
+    jobText:"",
+    hRule:[],
+    cCard:{}
 };
 
-// 回填快捷录入 / 历史记录
-(function(){
-    const quickFill = sessionStorage.getItem("quickFillData");
-    if(quickFill){
-        const d = JSON.parse(quickFill);
-        document.getElementById("companyName").value = d.companyName||"";
-        document.getElementById("postName").value = d.postName||"";
-        document.querySelector("textarea").value = d.jobText||"";
-        sessionStorage.removeItem("quickFillData");
-    }
-    const loadRecord = sessionStorage.getItem("loadRecordData");
-    if(loadRecord){
-        const d = JSON.parse(loadRecord);
-        document.getElementById("companyName").value = d.companyName||"";
-        document.getElementById("postName").value = d.postName||"";
-        document.getElementById("salaryRule").value = d.salaryRule||"";
-        document.getElementById("liveRule").value = d.liveRule||"";
-        document.getElementById("timeRule").value = d.timeRule||"";
-        formData.hRule = d.hRule;
-        renderRisk();
-        sessionStorage.removeItem("loadRecordData");
-    }
-})();
+const hRawList = [
+    {title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用"},
+    {title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺"},
+    {title:"异地外派风险",desc:"要求前往外地培训、上岗，不提供正规办公地址"},
+    {title:"身份证件扣押",desc:"要求上交身份证、银行卡原件或者索要验证码"},
+    {title:"借贷刷单任务",desc:"工作内容包含刷单、转账垫资、贷款操作"},
+    {title:"传销层级计酬",desc:"报酬依靠拉人头发展下线获取收益"},
+    {title:"空白合同签署",desc:"签署空白文件，放弃明确薪酬约定"},
+    {title:"竞业无限扩大",desc:"协议包含宽泛无边界的竞业限制"},
+    {title:"敏感信息采集",desc:"无合理必要理由强制采集人脸、声纹等隐私敏感数据"},
+    {title:"空白授权文件",desc:"签署空白文件、放弃书面明确的劳动权益"},
+    {title:"不等责协议责任",desc:"协议设置不对等的高额违约责任"},
+    {title:"无偿加班强制要求",desc:"强制无偿加班且无补偿方案"},
+    {title:"违规高强度夜班",desc:"安排未成年人或者在校学生长期夜班高危作业"},
+    {title:"单方面变更约定",desc:"企业可以随意变更岗位、薪资、工作地点而学生无权拒绝"},
+    {title:"变相收费扣款",desc:"通过罚款、扣费变相收取实习相关费用"},
+    {title:"外包转嫁用工责任",desc:"实际用工方和签约主体不一致，责任模糊不清"},
+    {title:"视频采集核验",desc:"要求录制承诺视频、人脸视频作为考核或者约束手段"}
+];
 
-// 渲染风险选项
-function renderRisk(){
-    const wrap = document.getElementById("riskWrap");
+const cRawList = [
+    {key:"C01",name:"实习薪资标准",core:true,disableNa:true},
+    {key:"C02",name:"薪资发放时间",core:true,disableNa:true},
+    {key:"C03",name:"工资发放方式",core:true,disableNa:true},
+    {key:"C04",name:"每日工作时长",core:true,disableNa:true},
+    {key:"C05",name:"每周休息安排",core:true,disableNa:true},
+    {key:"C06",name:"实习起止日期",core:true,disableNa:true},
+    {key:"C07",name:"实习具体岗位",core:true,disableNa:true},
+    {key:"C08",name:"办公工作地点",core:true,disableNa:true},
+    {key:"C09",name:"加班补偿规则",core:true,disableNa:true},
+    {key:"C10",name:"实习证明开具约定",core:true,disableNa:true},
+    {key:"C11",name:"住宿福利安排",core:false,disableNa:false},
+    {key:"C12",name:"餐补交通补贴",core:false,disableNa:false},
+    {key:"C13",name:"岗前培训内容",core:false,disableNa:false},
+    {key:"C14",name:"培训费用承担方",core:false,disableNa:false},
+    {key:"C15",name:"离职提前告知期限",core:false,disableNa:false},
+    {key:"C16",name:"实习考核规则",core:false,disableNa:false},
+    {key:"C17",name:"保险保障方案",core:false,disableNa:false},
+    {key:"C18",name:"岗位调动约束条件",core:false,disableNa:false},
+    {key:"C19",name:"保密协议内容",core:false,disableNa:false},
+    {key:"C20",name:"违约追责条款",core:false,disableNa:false}
+];
+
+function initEmptyCard(){
+    return {
+        status:"clear",
+        content:"",
+        contentType:"协议",
+        sourceNote:"",
+        confirmBy:"",
+        updatedAt:"",
+        naReason:""
+    }
+}
+
+function resetAllData(){
+    formData.hRule = hRawList.map(item=>{
+        return {...item,ans:"u"};
+    })
+    formData.cCard = {};
+    cRawList.forEach(k=>{
+        formData.cCard[k.key] = initEmptyCard();
+    })
+    document.getElementById("resultWrap").innerHTML = "";
+    document.getElementById("reportArea").classList.add("report-hidden");
+    renderH();
+    renderCCard();
+}
+
+function renderH(){
+    const wrap = document.getElementById("hList");
     wrap.innerHTML = "";
-    formData.hRule.forEach((item,i)=>{
+    formData.hRule.forEach((item,idx)=>{
         const div = document.createElement("div");
-        div.className = "risk-item";
+        div.className = "h-item";
         div.innerHTML = `
-            <span>${item.title}</span>
-            <div>
-                <input type="radio" name="r${i}" value="y" ${item.ans==="y"?"checked":""}>是
-                <input type="radio" name="r${i}" value="n" ${item.ans==="n"?"checked":""}>否
-                <input type="radio" name="r${i}" value="u" ${item.ans==="u"?"checked":""}>不确定
+            <div class="h-text">
+                <strong>${item.title}</strong> — ${item.desc}
             </div>
-        `;
+            <div class="h-radio-group">
+                <label><input type="radio" name="h${idx}" value="y">是</label>
+                <label><input type="radio" name="h${idx}" value="n">否</label>
+                <label><input type="radio" name="h${idx}" value="u" checked>不确定</label>
+            </div>`;
         wrap.appendChild(div);
     })
-}
-renderRisk();
-
-// 计算风险结果
-function calcRisk(){
-    formData.companyName = document.getElementById("companyName").value.trim();
-    formData.postName = document.getElementById("postName").value.trim();
-    formData.salaryRule = document.getElementById("salaryRule").value.trim();
-    formData.liveRule = document.getElementById("liveRule").value.trim();
-    formData.timeRule = document.getElementById("timeRule").value.trim();
-
-    formData.hRule.forEach((item,i)=>{
-        const sel = document.querySelector(`input[name="r${i}"]:checked`);
-        if(sel) item.ans = sel.value;
+    document.querySelectorAll('input[type="radio"]').forEach(radio=>{
+        radio.onchange = function(){
+            const idx = Number(this.name.replace("h",""));
+            formData.hRule[idx].ans = this.value;
+        }
     })
+}
 
-    let yesCnt = formData.hRule.filter(x=>x.ans==="y").length;
-    let html = `<p>生成时间：${new Date().toLocaleString()}</p><hr>
-    <p><strong>企业名称：</strong>${formData.companyName||"未填写"}</p>
-    <p><strong>实习岗位：</strong>${formData.postName||"未填写"}</p>
-    <p><strong>薪资结算方式：</strong>${formData.salaryRule||"未填写"}</p>
-    <p><strong>住宿福利安排：</strong>${formData.liveRule||"未填写"}</p>
-    <p><strong>工作时间约定：</strong>${formData.timeRule||"未填写"}</p>
-    <hr><h4>风险核验结果</h4>`;
-    formData.hRule.forEach(it=>{
-        let tag = "🟡待确认";
-        if(it.ans==="y") tag = "🔴存在风险";
-        if(it.ans==="n") tag = "🟢无风险";
-        html += `<p>${it.title}：${tag}</p>`;
+function renderCCard(){
+    const coreWrap = document.getElementById("coreCardWrap");
+    const expandWrap = document.getElementById("expandCardWrap");
+    coreWrap.innerHTML = "";
+    expandWrap.innerHTML = "";
+
+    cRawList.forEach(cfg=>{
+        const cardData = formData.cCard[cfg.key];
+        const dom = document.createElement("div");
+        dom.className = `c-card status-${cardData.status}`;
+        dom.innerText = cfg.name;
+        dom.onclick = ()=>openEditModal(cfg.key);
+        if(cfg.core){
+            coreWrap.appendChild(dom);
+        }else{
+            expandWrap.appendChild(dom);
+        }
     })
-    html += `<p style="margin-top:10px;font-weight:bold;">综合判定：${yesCnt>0?"⚠️该岗位存在风险隐患":"✅暂未发现明显风险"}</p>`;
-    document.getElementById("reportContent").innerHTML = html;
-    document.getElementById("reportBox").style.display = "block";
 }
 
-// 保存记录到工作台
-function saveRecord(){
-    calcRisk();
-    const list = JSON.parse(localStorage.getItem("internRecord")||"[]");
-    formData.time = new Date().toLocaleString();
-    list.push(JSON.parse(JSON.stringify(formData)));
-    localStorage.setItem("internRecord",JSON.stringify(list));
-    alert("保存成功！前往工作台查看");
-    window.location.href = "intern.html";
-}
-
-// PDF导出（带完整字段标题）
-function exportPdf(){
-    calcRisk();
-    const content = `
-    <div style="padding:30px;font-family:'Microsoft YaHei';">
-        <h2>实习岗位风险评估报告</h2>
-        <p>生成时间：${new Date().toLocaleString()}</p>
-        <hr/>
-        <p><strong>企业名称：</strong>${formData.companyName||"未填写"}</p>
-        <p><strong>实习岗位：</strong>${formData.postName||"未填写"}</p>
-        <p><strong>薪资结算方式：</strong>${formData.salaryRule||"未填写"}</p>
-        <p><strong>住宿福利安排：</strong>${formData.liveRule||"未填写"}</p>
-        <p><strong>工作时间约定：</strong>${formData.timeRule||"未填写"}</p>
-        <hr/>
-        <h3>风险核验清单</h3>
-        ${formData.hRule.map(it=>{
-            let tag = "待确认";
-            if(it.ans==="y") tag = "存在风险";
-            if(it.ans==="n") tag = "无风险";
-            return `<p>${it.title}：${tag}</p>`;
-        }).join("")}
-    </div>`;
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    html2pdf().set({margin:12}).from(tempDiv).save(`${formData.companyName||"实习风险报告"}.pdf`);
-}
-
-// OCR图片识别（超时保护）
-document.getElementById("imgUpload").addEventListener("change",async function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    try{
-        const result = await Promise.race([
-            Tesseract.recognize(file,'chi_sim'),
-            new Promise((_,rej)=>setTimeout(()=>rej("识别超时"),15000))
-        ]);
-        document.querySelector("textarea").value = result.data.text;
-    }catch(err){
-        alert("图片识别失败，请手动录入岗位信息");
+// 折叠展开按钮逻辑
+const toggleBtn = document.getElementById("toggleExpandBtn");
+const expandPanel = document.getElementById("expandPanel");
+toggleBtn.onclick = function(){
+    expandOpened = !expandOpened;
+    if(expandOpened){
+        expandPanel.classList.add("show");
+        toggleBtn.innerText = "收起拓展约定项";
+    }else{
+        expandPanel.classList.remove("show");
+        toggleBtn.innerText = "展开拓展约定项";
     }
-})
+}
+
+const modal = document.getElementById("editModal");
+const naOption = document.getElementById("naOption");
+const naReasonWrap = document.getElementById("naReasonWrap");
+const cardStatusSel = document.getElementById("cardStatus");
+
+cardStatusSel.onchange = function(){
+    if(this.value === "na"){
+        naReasonWrap.style.display = "block";
+    }else{
+        naReasonWrap.style.display = "none";
+    }
+}
+
+function openEditModal(key){
+    currentEditKey = key;
+    const cfg = cRawList.find(x=>x.key===key);
+    document.getElementById("modalTitle").innerText = "编辑："+cfg.name;
+    const d = formData.cCard[key];
+
+    if(cfg.disableNa){
+        naOption.style.display = "none";
+        if(d.status === "na") d.status = "clear";
+    }else{
+        naOption.style.display = "block";
+    }
+
+    cardStatusSel.value = d.status;
+    document.getElementById("cardContent").value = d.content;
+    document.getElementById("cardSourceType").value = d.contentType;
+    document.getElementById("cardSourceNote").value = d.sourceNote;
+    document.getElementById("cardConfirmBy").value = d.confirmBy;
+    document.getElementById("cardNaReason").value = d.naReason;
+
+    if(cardStatusSel.value === "na" && !cfg.disableNa){
+        naReasonWrap.style.display = "block";
+    }else{
+        naReasonWrap.style.display = "none";
+    }
+    modal.style.display = "flex";
+}
+
+document.getElementById("cancelEdit").onclick = ()=>modal.style.display="none";
+document.getElementById("saveEdit").onclick = function(){
+    const cfg = cRawList.find(x=>x.key===currentEditKey);
+    const obj = formData.cCard[currentEditKey];
+    obj.status = document.getElementById("cardStatus").value;
+    obj.content = document.getElementById("cardContent").value;
+    obj.contentType = document.getElementById("cardSourceType").value;
+    obj.sourceNote = document.getElementById("cardSourceNote").value;
+    obj.confirmBy = document.getElementById("cardConfirmBy").value;
+    obj.naReason = document.getElementById("cardNaReason").value;
+    obj.updatedAt = new Date().toLocaleString();
+    modal.style.display = "none";
+    renderCCard();
+}
+
+function calcRiskResult(){
+    const hasYes = formData.hRule.some(i=>i.ans === "y");
+    if(hasYes) return {level:"red",text:"🔴 高风险提示：问卷识别到明确的实习风险行为，请谨慎选择该实习岗位。"};
+    const hasUnknown = formData.hRule.some(i=>i.ans === "u");
+    if(hasUnknown) return {level:"yellow",text:"🟡 待核验：部分风险项信息不足，建议补充确认企业信息。"};
+    const coreC = cRawList.filter(x=>x.core === true).map(x=>x.key);
+    const coreAllConfirm = coreC.every(k=>formData.cCard[k].status === "confirm");
+    if(!coreAllConfirm){
+        return {level:"yellow",text:"🟡 待核验：风险问卷全部安全，但核心实习约定信息尚未完整确认。"}
+    }
+    return {level:"green",text:"🟢 在用户提供全部证据与当前规则覆盖范围内，暂未发现已确认的高风险信号，核心约定信息相对完整。本结果不构成安全认证或者法律意见。"}
+}
+
+function buildReport(){
+    const resObj = calcRiskResult();
+    document.getElementById("resultWrap").innerHTML = `<div class="result-block ${resObj.level}">${resObj.text}</div>`;
+    let html = `<div><strong>报告基础信息</strong><ul style="margin:8px 0 8px 20px;">
+    <li>企业全称：${formData.companyName || "未填写"}</li>
+    <li>实习岗位：${formData.postName || "未填写"}</li>
+    <li>报告生成时间：${new Date().toLocaleString()}</li>
+    </ul></div>`;
+
+    html += `<div style="margin-top:16px;"><strong>核心实习约定卡片详情</strong><br>`;
+    cRawList.filter(item=>item.core).forEach(item=>{
+        const d = formData.cCard[item.key];
+        html += `<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:14px;">
+        <strong>${item.name}</strong> 状态：${d.status}｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"-"}｜更新：${d.updatedAt||""}
+        </div>`;
+    })
+    html += `</div>`;
+
+    html += `<div style="margin-top:16px;"><strong>拓展补充约定卡片详情</strong><br>`;
+    cRawList.filter(item=>!item.core).forEach(item=>{
+        const d = formData.cCard[item.key];
+        html += `<div style="padding:8px 0;border-bottom:1px solid #eee;font-size:14px;">
+        <strong>${item.name}</strong> 状态：${d.status}｜内容：${d.content||"无"}｜来源：${d.contentType}｜确认人：${d.confirmBy||"-"}｜更新：${d.updatedAt||""}
+        ${(!item.disableNa && d.status==="na")?"｜不适用原因："+d.naReason:""}
+        </div>`;
+    })
+    html += `</div>`;
+
+    const confirmText = "您好，向您确认本次实习约定内容："+Object.values(formData.cCard).filter(x=>x.content).map(x=>x.content).join("；")+"，请确认是否无误。";
+    document.getElementById("confirmMsg").innerText = confirmText;
+    document.getElementById("reportContent").innerHTML = html;
+    document.getElementById("reportArea").classList.remove("report-hidden");
+}
+
+document.getElementById("exportPdfBtn").onclick = function(){
+    const opt = {
+        margin:10,
+        filename:"实习风险评估报告.pdf",
+        html2canvas:{scale:2},
+        jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
+    };
+    const printDom = document.getElementById("reportArea");
+    html2pdf().set(opt).from(printDom).save();
+}
+
+document.getElementById("saveRecordBtn").onclick = function(){
+    const saveObj = {
+        id:Date.now(),
+        time:new Date().toLocaleString(),
+        companyName:formData.companyName,
+        postName:formData.postName,
+        jobText:formData.jobText,
+        hRule:JSON.parse(JSON.stringify(formData.hRule)),
+        cCard:JSON.parse(JSON.stringify(formData.cCard))
+    }
+    let list = JSON.parse(localStorage.getItem("internRecord")||"[]");
+    list.unshift(saveObj);
+    localStorage.setItem("internRecord",JSON.stringify(list));
+    alert("评估记录已保存，前往工作台查看！");
+}
+
+document.getElementById("jobText").oninput = function(){
+    resetAllData();
+    formData.jobText = this.value;
+}
+document.getElementById("companyName").oninput = ()=>formData.companyName = document.getElementById("companyName").value;
+document.getElementById("postName").oninput = ()=>formData.postName = document.getElementById("postName").value;
+
+document.getElementById("checkCompanyBtn").onclick = function(){
+    window.open("https://www.gsxt.gov.cn/","_blank");
+}
+
+document.getElementById("calcResultBtn").onclick = buildReport;
+
+document.getElementById("ocrBtn").onclick = async function(){
+    const file = document.getElementById("ocrFile").files[0];
+    if(!file)return alert("请先选择图片");
+    document.getElementById("ocrTip").innerText="识别加载中，请等待...";
+    try{
+        const res = await Tesseract.recognize(file,"chi_sim+eng");
+        document.getElementById("jobText").value = res.data.text;
+        formData.jobText = res.data.text;
+        resetAllData();
+        document.getElementById("ocrTip").innerText="识别完成";
+    }catch(e){
+        document.getElementById("ocrTip").innerText="识别失败，请手动填写岗位信息";
+    }
+}
+
+resetAllData();
 </script>
 </body>
 </html>
