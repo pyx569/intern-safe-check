@@ -452,6 +452,7 @@ function readQuestionValue(){
     });
 }
 
+// ===== 修改后的风险判断逻辑：只看H问卷 =====
 function calcRiskResult(){
     readQuestionValue();
     const yesList = [];
@@ -460,10 +461,8 @@ function calcRiskResult(){
         if(formData.hRule[i].ans === "y") yesList.push(riskMeta[i]);
         if(formData.hRule[i].ans === "u") unsureList.push(hRawList[i].title);
     }
-    const coreCards = cRawList.filter(item=>item.disableNa===true);
-    const coreAllConfirmed = coreCards.every(card=>formData.cCard[card.key].status === "confirm");
-    const unconfirmedCore = coreCards.filter(card=>formData.cCard[card.key].status !== "confirm").map(card=>card.name);
 
+    // 只要有任意一项选【是】→红色高危
     if(yesList.length > 0){
         let text = "🔴 发现高风险信号\n\n";
         text += "以下风险核验项选择【是】，存在明确高风险，不建议参与本次实习：\n";
@@ -472,16 +471,13 @@ function calcRiskResult(){
         });
         return {level:"red", text};
     }
-    if(unsureList.length > 0 || !coreAllConfirmed){
-        let text = "🟡 信息不足，暂不能形成低风险结论\n\n";
-        if(unsureList.length >0) text += "存在部分风险项结果为「不确定」，建议进一步向企业核实信息。\n";
-        if(!coreAllConfirmed){
-            text += "以下核心实习约定尚未全部确认，请补充填写并标记为「已确认」：\n";
-            unconfirmedCore.forEach(name=>text += `· ${name}\n`);
-        }
+    // 没有是，但存在不确定 → 黄色
+    if(unsureList.length > 0){
+        let text = "🟡 信息待核验\n\n存在部分风险项结果为「不确定」，建议进一步向企业核实相关信息。";
         return {level:"orange",text};
     }
-    return {level:"green",text:"🟢 暂未发现明确高风险信号\n\n全部风险项均选择【否】，且10项核心实习约定均完成确认。可正常开展实习，建议留存全部沟通凭证。"};
+    // 全部选否 →绿色
+    return {level:"green",text:"🟢 暂未发现明确高风险信号\n\n全部风险项均选择【否】。建议完善实习约定卡片，留存书面凭证保护自身权益。"};
 }
 
 function generateReport(){
