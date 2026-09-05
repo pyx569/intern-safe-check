@@ -201,6 +201,7 @@ function readQuestionValue(){
     });
 }
 
+//简易版同样更新判断逻辑
 function calcRiskResult(){
     readQuestionValue();
     const yesList = [];
@@ -209,26 +210,21 @@ function calcRiskResult(){
         if(formData.hRule[i].ans === "y") yesList.push(riskMeta[i]);
         if(formData.hRule[i].ans === "u") unsureList.push(hRawList[i].title);
     }
-    const allUnknown = formData.hRule.every(i=>i.ans === "u");
-    if(allUnknown){
-        return {level:"orange",text:"🟡 待核验提示：全部风险项均为不确定，请完成风险核验后再生成报告。"};
-    }
 
-    let text = "";
     if(yesList.length>0){
-        text += "🔴【高危风险】\n";
+        let text = "🔴【高危风险】\n";
         yesList.forEach(h=>{
             text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
         });
+        return {level:"red",text:text};
     }
     if(unsureList.length>0){
-        text += "\n🟡【潜在风险提醒】\n";
+        let text = "🟡【潜在风险提醒】\n";
         unsureList.forEach(w=>{
             text += `· ${w}：结果为不确定，建议进一步核实\n`;
         });
+        return {level:"yellow",text};
     }
-    if(yesList.length>0) return {level:"red",text:text};
-    if(unsureList.length>0) return {level:"yellow",text};
     return {level:"green",text:"🟢 基础风险核验通过，简易版不包含实习约定卡片核验，如需完整评估请切换至完整评估页面。"};
 }
 
