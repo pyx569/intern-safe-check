@@ -3,64 +3,677 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>快捷录入｜实习有约</title>
+    <title>快捷录入｜实习有约【测试版】</title>
+    <script src="https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei",sans-serif; }
-        body { padding:40px 30px; max-width:800px; margin:0 auto; background:#f5f7fa; }
-        .header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
-        h1 { font-size:28px; color:#222; }
-        .btn { border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:15px; }
-        .btn-blue { background:#1677ff; color:#fff; }
-        .btn-gray { background:#94a3b8; color:#fff; }
-        .form-card { background:#fff; border-radius:12px; padding:30px; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
-        .form-item { margin-bottom:22px; }
-        .form-item label { display:block; font-weight:bold; margin-bottom:8px; color:#333; font-size:15px; }
-        .form-item input, .form-item textarea {
-            width:100%; padding:12px; border:1px solid #d9d9d9; border-radius:8px; font-size:15px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
         }
-        .form-item textarea { min-height:180px; resize:vertical; }
-        .tip { font-size:13px; color:#888; margin-top:6px; line-height:1.6; }
-        .btn-row { display:flex; gap:12px; margin-top:24px; }
+        body {
+            background: #ffffff;
+            padding: 40px 20px;
+            color:#333;
+        }
+        .test-tip{
+            background:#fffbe6;
+            border:1px solid #ffcc00;
+            border-radius:8px;
+            padding:12px 16px;
+            color:#fa8c16;
+            font-weight:bold;
+            text-align:center;
+            margin-bottom:24px;
+        }
+        .container{
+            max-width:1100px;
+            margin:0 auto;
+        }
+        .header-bar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+        }
+        .btn{
+            padding:8px 16px;
+            border-radius:6px;
+            border:none;
+            cursor:pointer;
+            font-size:14px;
+        }
+        .btn-primary{
+            background:#1677ff;
+            color:#fff;
+        }
+        .btn-warning{
+            background:#faad14;
+            color:#fff;
+        }
+        .btn-danger{
+            background:#ff4d4f;
+            color:#fff;
+        }
+        .btn-success{
+            background:#52c41a;
+            color:#fff;
+        }
+        .section{
+            margin-bottom:32px;
+            border:1px solid #eee;
+            border-radius:10px;
+            padding:24px;
+        }
+        .section-title{
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:16px;
+        }
+        textarea,input{
+            width:100%;
+            border:1px solid #d9d9d9;
+            border-radius:6px;
+            padding:10px;
+            font-size:14px;
+        }
+        .card-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+            gap:16px;
+            margin-top:16px;
+        }
+        .c-card{
+            border-radius:8px;
+            padding:14px;
+            border:1px solid #ddd;
+            cursor:pointer;
+        }
+        .status-clear{background:#fff;border-color:#ccc;}
+        .status-pending{background:#fffbe6;border-color:#ffe58f;}
+        .status-confirm{background:#f6ffed;border-color:#b7eb8f;}
+        .status-na{background:#f5f5f5;border-color:#d9d9d9;color:#666;}
+        .result-block{
+            padding:20px;
+            border-radius:8px;
+            margin:20px 0;
+            white-space: pre‑line;
+            line-height:1.8;
+        }
+        .red{background:#fff1f0;border:1px solid #ffa39e;}
+        .yellow{background:#fffbe6;border:1px solid #ffe58f;}
+        .green{background:#f6ffed;border:1px solid #b7eb8f;}
+        .modal{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.4);
+            align-items:center;
+            justify-content:center;
+            z-index:999;
+        }
+        .modal-box{
+            background:#fff;
+            padding:24px;
+            border-radius:10px;
+            width:90%;
+            max-width:520px;
+        }
+        .report-hidden{
+            display:none;
+        }
+        .h-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:14px 0;
+            border-bottom:1px solid #eee;
+            gap:20px;
+        }
+        .h-text{
+            flex:1;
+            line-height:1.6;
+        }
+        .h-radio-group{
+            flex-shrink:0;
+            white-space:nowrap;
+            display:flex;
+            gap:14px;
+            align-items:center;
+        }
+        .h-radio-group label{
+            display:flex;
+            align-items:center;
+            gap:4px;
+            cursor:pointer;
+        }
+        .h-radio-group input[type="radio"]{
+            width:auto;
+            margin:0;
+        }
+        .input-row{
+            display:flex;
+            gap:16px;
+            flex-wrap:wrap;
+            align-items:center;
+            margin-top:10px;
+        }
+        .input-item{
+            flex:1;
+            min-width:200px;
+        }
+        .expand-btn-area{
+            text-align:center;
+            margin-top:18px;
+        }
+        .expand-content{
+            display:none;
+            margin-top:16px;
+        }
+        .expand-content.show{
+            display:block;
+        }
+        .report-item{
+            padding:8px 0;
+            border-bottom:1px solid #efefef;
+            line-height:1.7;
+        }
+        .btn-group-row{
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            flex-wrap:wrap;
+        }
+        .no-print{}
+        @media print{
+            .no-print{display:none !important;}
+            .result-block{display:none !important;}
+            body{padding:0;background:#fff;}
+        }
     </style>
 </head>
 <body>
-    <div class="header-row">
-        <h1>快捷录入岗位信息</h1>
-        <button class="btn btn-gray" onclick="window.location.href='index.html'">返回评估主页</button>
-    </div>
-    <div class="form-card">
-        <div class="form-item">
-            <label>单位全称</label>
-            <input id="companyName" placeholder="请填写企业完整名称">
-        </div>
-        <div class="form-item">
-            <label>岗位名称</label>
-            <input id="postName" placeholder="请填写实习岗位名称">
-        </div>
-        <div class="form-item">
-            <label>岗位完整描述</label>
-            <textarea id="jobText" placeholder="粘贴招聘信息、岗位描述、薪资待遇、工作内容等完整信息"></textarea>
-            <div class="tip">填写完成后点击「开始风险评估」，系统将自动带入这些信息进入评估流程</div>
-        </div>
-        <div class="btn-row">
-            <button class="btn btn-blue" onclick="goEvaluate()">开始风险评估</button>
-            <button class="btn btn-gray" onclick="window.location.href='index.html'">直接进入评估主页</button>
+<div class="container">
+    <div class="test-tip no-print">⚠️ 本页面处于测试阶段，评估结果仅供快速参考，不建议作为正式使用版本</div>
+    <div class="header-bar no-print">
+        <h1>快捷录入｜实习风险评估</h1>
+        <div>
+            <a href="index.html"><button class="btn">返回评估主页</button></a>
+            <a href="intern.html"><button class="btn">我的工作台</button></a>
         </div>
     </div>
+
+    <div class="section no-print">
+        <div class="section-title">第一步：填写/识别岗位招聘信息（系统将自动给出风险推荐）</div>
+        <textarea id="jobText" rows="6" placeholder="粘贴岗位描述，或者上传截图自动识别"></textarea>
+        <div style="margin:12px 0;">
+            <input type="file" id="ocrFile" accept="image/*">
+            <button class="btn btn-warning" id="ocrBtn">开始识图提取文字</button>
+            <button class="btn btn-primary" id="autoGuessBtn">基于文本自动推荐风险选项</button>
+            <span id="ocrTip"></span>
+        </div>
+        <div class="input-row">
+            <div class="input-item">
+                <label>单位全称：</label>
+                <input id="companyName" placeholder="填写企业完整名称">
+            </div>
+            <div class="input-item">
+                <label>岗位名称：</label>
+                <input id="postName" placeholder="填写实习岗位">
+            </div>
+            <div style="margin-top:22px">
+                <button class="btn btn-primary" id="checkCompanyBtn">一键工商核验</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section no-print">
+        <div class="section-title">第二步：17项实习风险人工核验（系统已给出推荐，您可修改）</div>
+        <div id="hList"></div>
+    </div>
+
+    <div class="section no-print">
+        <div class="section-title">第三步：实习约定信息核验卡片（点击卡片编辑详情）</div>
+        <div id="coreCardWrap" class="card-grid"></div>
+
+        <div class="expand-btn-area no-print">
+            <button class="btn" id="toggleExpandBtn">展开拓展约定项</button>
+        </div>
+
+        <div class="expand-content" id="expandPanel">
+            <p style="margin:12px 0;color:#666;">拓展补充约定（可选核验项）</p>
+            <div id="expandCardWrap" class="card-grid"></div>
+        </div>
+    </div>
+
+    <div class="no-print btn-group-row">
+        <button class="btn btn-success" id="calcResultBtn">生成风险评估报告</button>
+    </div>
+
+    <div id="resultWrap" class="no-print"></div>
+
+    <div id="reportArea" class="report-hidden">
+        <div class="section">
+            <div class="section-title">📄实习约定确认卡</div>
+            <div id="reportContent"></div>
+            <div style="margin-top:20px;">
+                <h4>发给HR确认话术预览：</h4>
+                <p id="confirmMsg" style="background:#f5f5f5;padding:12px;border-radius:6px;"></p>
+            </div>
+            <div style="margin-top:24px;color:#666;font-size:13px;border-top:1px solid #eee;padding-top:16px;">
+                <strong>免责声明：</strong>本工具提供的内容仅作为实习参考，不替代劳动合同、实习协议或法律意见。评估结果不构成安全认证，不代表企业承诺。
+            </div>
+        </div>
+        <div class="no-print" style="text-align:center;margin-bottom:30px;">
+            <button class="btn btn-primary" id="exportPdfBtn">打印 / 保存为PDF</button>
+            <button class="btn" id="saveRecordBtn">保存本次评估到工作台</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editModal">
+    <div class="modal-box">
+        <h3 id="modalTitle">编辑卡片信息</h3>
+        <div style="margin:10px 0;">
+            <label>状态</label>
+            <select id="cardStatus" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:6px;">
+                <option value="clear">待填写</option>
+                <option value="pending">待确认</option>
+                <option value="confirm">已确认</option>
+                <option id="naOption" value="na">不适用</option>
+            </select>
+        </div>
+        <div style="margin:10px 0;">
+            <label>填写内容</label>
+            <textarea id="cardContent" rows="3"></textarea>
+        </div>
+        <div style="margin:10px 0;">
+            <label>信息来源类型</label>
+            <select id="cardSourceType" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:6px;">
+                <option value="协议">协议</option>
+                <option value="聊天记录">聊天记录</option>
+                <option value="公告">公告</option>
+                <option value="口头告知">口头告知</option>
+                <option value="其他">其他</option>
+            </select>
+        </div>
+        <div style="margin:10px 0;">
+            <label>来源备注</label>
+            <input id="cardSourceNote">
+        </div>
+        <div style="margin:10px 0;">
+            <label>确认方</label>
+            <input id="cardConfirmBy">
+        </div>
+        <div id="naReasonWrap" style="margin:10px 0;display:none;">
+            <label>不适用原因（选「不适用」必填）</label>
+            <textarea id="cardNaReason" rows="2"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+            <button class="btn" id="cancelEdit">取消</button>
+            <button class="btn btn-primary" id="saveEdit">保存</button>
+        </div>
+    </div>
+</div>
 
 <script>
-function goEvaluate(){
-    const companyName = document.getElementById("companyName").value.trim();
-    const postName = document.getElementById("postName").value.trim();
-    const jobText = document.getElementById("jobText").value.trim();
+const statusMap = {
+    clear:"待填写",
+    pending:"待确认",
+    confirm:"已确认",
+    na:"不适用"
+};
 
-    if(!companyName && !postName && !jobText){
-        alert("请至少填写一项岗位信息后再开始评估");
+const riskMeta = [
+    {title:"收费/押金要求",tip:"收费类实习存在诈骗风险，正规实习不得向学生收取任何费用",suggest:"拒绝缴纳任何费用，更换实习单位"},
+    {title:"高额提成保底陷阱",tip:"薪资完全依靠提成无基础保障，谨防口头高薪骗局",suggest:"务必确认书面底薪与薪资构成，拒绝仅口头承诺高薪"},
+    {title:"异地外派风险",tip:"无正规办公地点的异地外派存在人身安全隐患",suggest:"核实企业资质、办公地址，谨慎前往异地"},
+    {title:"身份证件扣押",tip:"用人单位不允许扣押学生身份证、银行卡原件",suggest:"拒绝上交证件原件，仅可提供复印件并做好签注"},
+    {title:"借贷刷单任务",tip:"刷单、垫资转账属于典型电信诈骗模式",suggest:"直接放弃该实习岗位，切勿参与资金操作"},
+    {title:"传销层级计酬",tip:"依靠拉人头获取报酬属于传销特征",suggest:"立即放弃该实习，必要时报警"},
+    {title:"空白合同签署",tip:"签署空白文件会造成权益完全不受保护",suggest:"拒绝签署任何空白合同与空白文件"},
+    {title:"竞业无限扩大",tip:"宽泛无边界竞业协议会限制后续就业",suggest:"协商修改竞业范围、期限与补偿金条款"},
+    {title:"敏感信息采集",tip:"在未说明必要性、用途、保存期限和保护措施的前提下强制采集隐私信息存在泄露风险",suggest:"拒绝非必要且无书面说明的敏感信息采集要求"},
+    {title:"空白文件与放弃权益",tip:"签署空白文件或主动放弃实习报酬、实习证明等法定基本权益，自身权益将不受保障",suggest:"绝不签署空白文件，不放弃书面明确的实习权益"},
+    {title:"不对等协议责任",tip:"协议设置明显不对等的高额违约责任、过度竞业限制、无限期绑定或者企业单方免责条款",suggest:"和企业协商修改权责不对等的违约与约束条款"},
+    {title:"无偿加班强制要求",tip:"强制无偿加班侵害学生实习权益",suggest:"和HR确认加班补偿方式，留存沟通记录"},
+    {title:"违规高强度夜班",tip:"学生/未成年人长期高危夜班存在安全风险",suggest:"拒绝高危夜班岗位"},
+    {title:"隔离核验与紧迫施压",tip:"对方阻止你向家人、学校或官方渠道核实信息，同时催促你立刻付款、提交敏感材料或仓促做决定",suggest:"放缓签约节奏，通过官方渠道核验企业信息，拒绝仓促操作"},
+    {title:"变相收费扣款",tip:"以罚款、扣费变相收取实习相关费用",suggest:"拒绝各类变相扣费规则"},
+    {title:"外包转嫁用工责任",tip:"签约主体与实际用工不一致，责任容易互相推诿",suggest:"明确实际用工方、签约方各自权责"},
+    {title:"疑似深伪身份",tip:"面试身份无法通过企业官方渠道核验，同时出现画面/声音异常，或要求采集和招聘无关的人脸、声纹身份材料",suggest:"通过企业公开官网、官方电话核验招聘人员真实身份"}
+];
+
+const hRawList = [
+    {title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用",keywords:["押金","保证金","培训费","服装费","建档费"]},
+    {title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺",keywords:["提成","无责底薪0","高薪诱惑"]},
+    {title:"异地外派风险",desc:"要求前往外地培训、上岗，不提供正规办公地址",keywords:["外地培训","异地","外派","边境"]},
+    {title:"身份证件扣押",desc:"要求上交身份证、银行卡原件或者索要验证码",keywords:["扣押身份证","上交银行卡","验证码"]},
+    {title:"借贷刷单任务",desc:"工作内容包含刷单、转账垫资、贷款操作",keywords:["刷单","垫付","转账","充值解冻"]},
+    {title:"传销层级计酬",desc:"报酬依靠拉人头发展下线获取收益",keywords:["拉人头","下线","层级提成"]},
+    {title:"空白合同签署",desc:"签署空白文件，放弃明确薪酬约定",keywords:["空白合同","空白协议"]},
+    {title:"竞业无限扩大",desc:"协议包含宽泛无边界的竞业限制",keywords:["竞业","终身限制"]},
+    {title:"敏感信息采集",desc:"对方是否在未说明必要性、使用目的、保存期限和保护措施的情况下，强制要求采集人脸、指纹、手持身份证照片等敏感信息？",keywords:["人脸","指纹","手持身份证"]},
+    {title:"空白文件与放弃权益",desc:"是否要求签署空白文件，或书面放弃已经明确的报酬、实习证明等基本权益？",keywords:["放弃报酬","放弃证明","空白文件"]},
+    {title:"不对等协议责任",desc:"协议是否设置明显不对等的高额违约责任、过度竞业限制、无限期绑定或单方免责条款？",keywords:["高额违约金","单方免责"]},
+    {title:"无偿加班强制要求",desc:"强制无偿加班且无补偿方案",keywords:["无偿加班","无加班费"]},
+    {title:"违规高强度夜班",desc:"安排未成年人或者在校学生长期夜班高危作业",keywords:["夜班","通宵值班"]},
+    {title:"隔离核验与紧迫施压",desc:"对方是否阻止你向家人、学校或企业官方渠道核验，同时催促你立即付款、提交敏感信息或作出决定？",keywords:["尽快决定","抓紧交钱","不要告诉别人"]},
+    {title:"变相收费扣款",desc:"通过罚款、扣费变相收取实习相关费用",keywords:["罚款","扣费","违约金抵扣"]},
+    {title:"外包转嫁用工责任",desc:"实际用工方和签约主体不一致，责任模糊不清",keywords:["外包","第三方签约"]},
+    {title:"疑似深伪身份",desc:"面试对象身份是否无法通过企业官方渠道核验，且存在画面、声音异常，或要求采集与招聘无关的人脸、声音及身份材料？",keywords:["视频换脸","语音验证"]}
+];
+
+const cRawList = [
+    {key:"C01",name:"实习薪资标准",core:true,disableNa:true},
+    {key:"C02",name:"薪资发放时间",core:true,disableNa:true},
+    {key:"C03",name:"工资发放方式",core:true,disableNa:true},
+    {key:"C04",name:"每日工作时长",core:true,disableNa:true},
+    {key:"C05",name:"每周休息安排",core:true,disableNa:true},
+    {key:"C06",name:"实习起止日期",core:true,disableNa:true},
+    {key:"C07",name:"实习具体岗位",core:true,disableNa:true},
+    {key:"C08",name:"办公工作地点",core:true,disableNa:true},
+    {key:"C09",name:"加班补偿规则",core:true,disableNa:true},
+    {key:"C10",name:"实习证明开具约定",core:true,disableNa:true},
+    {key:"C11",name:"住宿福利安排",core:false,disableNa:false},
+    {key:"C12",name:"餐补交通补贴",core:false,disableNa:false},
+    {key:"C13",name:"岗前培训内容",core:false,disableNa:false},
+    {key:"C14",name:"培训费用承担方",core:false,disableNa:false},
+    {key:"C15",name:"离职提前告知期限",core:false,disableNa:false},
+    {key:"C16",name:"实习考核规则",core:false,disableNa:false},
+    {key:"C17",name:"保险保障方案",core:false,disableNa:false},
+    {key:"C18",name:"岗位调动约束条件",core:false,disableNa:false},
+    {key:"C19",name:"保密协议内容",core:false,disableNa:false},
+    {key:"C20",name:"违约追责条款",core:false,disableNa:false}
+];
+
+let currentEditKey = "";
+let expandOpened = false;
+let formData = {
+    companyName:"",
+    postName:"",
+    jobText:"",
+    hRule:[],
+    cCard:{}
+};
+
+function initEmptyCard(){
+    return {
+        status:"clear",
+        content:"",
+        contentType:"协议",
+        sourceNote:"",
+        confirmBy:"",
+        updatedAt:"",
+        naReason:""
+    }
+}
+
+resetAllData();
+
+function resetAllData(){
+    formData.hRule = hRawList.map(item=> ({...item,ans:"u"}));
+    formData.cCard = {};
+    cRawList.forEach(k=>formData.cCard[k.key]=initEmptyCard());
+    document.getElementById("resultWrap").innerHTML = "";
+    document.getElementById("reportArea").classList.add("report-hidden");
+    renderH();
+    renderCCard();
+}
+
+function renderH(){
+    const wrap = document.getElementById("hList");
+    wrap.innerHTML = "";
+    formData.hRule.forEach((item,idx)=>{
+        const div = document.createElement("div");
+        div.className = "h-item";
+        div.innerHTML = `
+            <div class="h-text"><strong>${item.title}</strong> — ${item.desc}</div>
+            <div class="h-radio-group">
+                <label><input type="radio" name="h${idx}" value="y">是</label>
+                <label><input type="radio" name="h${idx}" value="n">否</label>
+                <label><input type="radio" name="h${idx}" value="u">不确定</label>
+            </div>`;
+        wrap.appendChild(div);
+        document.querySelector(`input[name="h${idx}"][value="${item.ans}"]`).checked = true;
+    });
+    document.querySelectorAll('input[type="radio"]').forEach(radio=>{
+        radio.onchange = function(){
+            const idx = Number(this.name.replace("h",""));
+            formData.hRule[idx].ans = this.value;
+        };
+    });
+}
+
+function autoRecommend(){
+    const text = document.getElementById("jobText").value.toLowerCase();
+    for(let i=0;i<hRawList.length;i++){
+        const words = hRawList[i].keywords;
+        const hit = words.some(w=>text.includes(w));
+        formData.hRule[i].ans = hit ? "y":"u";
+    }
+    renderH();
+    alert("已完成自动风险推荐，请人工复核修改！");
+}
+
+document.getElementById("autoGuessBtn").onclick = autoRecommend;
+
+function renderCCard(){
+    const coreWrap = document.getElementById("coreCardWrap");
+    const expandWrap = document.getElementById("expandCardWrap");
+    coreWrap.innerHTML = ""; expandWrap.innerHTML = "";
+    cRawList.forEach(cfg=>{
+        const cardData = formData.cCard[cfg.key];
+        const dom = document.createElement("div");
+        dom.className = `c-card status-${cardData.status}`;
+        dom.innerText = cfg.name;
+        dom.onclick = ()=>openEditModal(cfg.key);
+        cfg.core ? coreWrap.appendChild(dom) : expandWrap.appendChild(dom);
+    });
+}
+
+const toggleBtn = document.getElementById("toggleExpandBtn");
+const expandPanel = document.getElementById("expandPanel");
+toggleBtn.onclick = function(){
+    expandOpened = !expandOpened;
+    if(expandOpened){ expandPanel.classList.add("show"); toggleBtn.innerText = "收回拓展约定项";}
+    else{ expandPanel.classList.remove("show"); toggleBtn.innerText = "展开拓展约定项";}
+};
+
+const modal = document.getElementById("editModal");
+const naOption = document.getElementById("naOption");
+const naReasonWrap = document.getElementById("naReasonWrap");
+const cardStatusSel = document.getElementById("cardStatus");
+
+cardStatusSel.onchange = function(){
+    naReasonWrap.style.display = (this.value==="na")?"block":"none";
+};
+
+function openEditModal(key){
+    currentEditKey = key;
+    const cfg = cRawList.find(x=>x.key===key);
+    document.getElementById("modalTitle").innerText = "编辑："+cfg.name;
+    const d = formData.cCard[key];
+    if(cfg.disableNa){
+        naOption.style.display = "none";
+        if(d.status === "na") d.status = "clear";
+    }else{
+        naOption.style.display = "block";
+    }
+    cardStatusSel.value = d.status;
+    document.getElementById("cardContent").value = d.content;
+    document.getElementById("cardSourceType").value = d.contentType;
+    document.getElementById("cardSourceNote").value = d.sourceNote;
+    document.getElementById("cardConfirmBy").value = d.confirmBy;
+    document.getElementById("cardNaReason").value = d.naReason;
+    naReasonWrap.style.display = (cardStatusSel.value==="na"&&!cfg.disableNa)?"block":"none";
+    modal.style.display = "flex";
+}
+
+document.getElementById("cancelEdit").onclick = ()=>modal.style.display="none";
+
+document.getElementById("saveEdit").onclick = function(){
+    const cfg = cRawList.find(x=>x.key===currentEditKey);
+    const obj = formData.cCard[currentEditKey];
+    const st = document.getElementById("cardStatus").value.trim();
+    const cnt = document.getElementById("cardContent").value.trim();
+    const srcType = document.getElementById("cardSourceType").value.trim();
+    const confirmUser = document.getElementById("cardConfirmBy").value.trim();
+    const naReasonVal = document.getElementById("cardNaReason").value.trim();
+
+    if(st === "confirm"){
+        if(!cnt||!srcType||!confirmUser){
+            alert("标记为【已确认】时，必须填写具体内容、信息来源与确认方！");
+            return;
+        }
+    }
+    if(st === "na"){
+        if(!naReasonVal){
+            alert("选择【不适用】必须填写不适用原因！");
+            return;
+        }
+    }
+    obj.status = st;
+    obj.content = document.getElementById("cardContent").value;
+    obj.contentType = document.getElementById("cardSourceType").value;
+    obj.sourceNote = document.getElementById("cardSourceNote").value;
+    obj.confirmBy = document.getElementById("cardConfirmBy").value;
+    obj.naReason = document.getElementById("cardNaReason").value;
+    obj.updatedAt = new Date().toLocaleString();
+    modal.style.display = "none";
+    renderCCard();
+};
+
+function calcRiskResult(){
+    const yesList = [];
+    for(let i=0;i<formData.hRule.length;i++){
+        if(formData.hRule[i].ans === "y"){
+            yesList.push(riskMeta[i]);
+        }
+    }
+
+    const hasUnknown = formData.hRule.some(i=>i.ans === "u");
+    const coreCards = cRawList.filter(item=>item.core);
+    const coreAllConfirmed = coreCards.every(card=>{
+        return formData.cCard[card.key].status === "confirm";
+    });
+    const unconfirmedCore = coreCards.filter(card=>{
+        return formData.cCard[card.key].status !== "confirm";
+    }).map(card=>card.name);
+
+    if(yesList.length > 0){
+        let text = "🔴 发现高风险信号\n\n";
+        text += "以下风险核验项选择为「是」，存在明确高风险，不建议参与本次实习：\n";
+        yesList.forEach(h=>{
+            text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
+        });
+        return {level:"red", text:text};
+    }
+
+    if(hasUnknown || !coreAllConfirmed){
+        let text = "🟡 信息不足，暂不能形成低风险结论\n\n";
+        if(hasUnknown){
+            text += "存在部分风险项选择为「不确定」，请进一步核实岗位信息后重新评估。\n";
+        }
+        if(!coreAllConfirmed){
+            text += "以下核心实习约定尚未全部确认，请补充填写并标记为「已确认」：\n";
+            unconfirmedCore.forEach(name=>{
+                text += `· ${name}\n`;
+            });
+        }
+        text += "\n建议：补齐全部实习约定书面凭证，与HR确认后再行评估。";
+        return {level:"yellow", text:text};
+    }
+
+    return {
+        level:"green",
+        text:"🟢 暂未发现明确高风险信号\n\n全部17项风险核验均为「否」，且10项核心实习约定均已确认。\n建议：留存全部书面实习协议与沟通记录，保障自身实习权益。"
+    };
+}
+
+document.getElementById("calcResultBtn").onclick = function(){
+    const company = document.getElementById("companyName").value.trim();
+    const post = document.getElementById("postName").value.trim();
+    if(!company||!post){
+        alert("请先填写企业名称和实习岗位！");
         return;
     }
-    sessionStorage.setItem("quickFillData", JSON.stringify({companyName,postName,jobText}));
-    window.location.href = "index.html";
-}
+
+    formData.companyName = company;
+    formData.postName = post;
+    formData.jobText = document.getElementById("jobText").value.trim();
+    const res = calcRiskResult();
+    const wrap = document.getElementById("resultWrap");
+    wrap.innerHTML = `<div class="result-block ${res.level}">${res.text}</div>`;
+
+    let reportHtml = "<h4>核心实习约定卡片详情</h4>";
+    cRawList.filter(item=>item.core).forEach(card=>{
+        const d = formData.cCard[card.key];
+        if(d.status === "clear") return;
+        const statusText = statusMap[d.status];
+        const showContent = d.content||"无";
+        const sourceText = d.contentType||"协议";
+        const confirmPerson = d.confirmBy||"—";
+        let extra = d.status==="na"?`｜不适用原因：${d.naReason||""}`:"";
+        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}${extra}</div>`;
+    });
+
+    reportHtml += "<br><h4>拓展补充约定卡片详情</h4>";
+    cRawList.filter(item=>!item.core).forEach(card=>{
+        const d = formData.cCard[card.key];
+        if(d.status === "clear") return;
+        const statusText = statusMap[d.status];
+        const showContent = d.content||"无";
+        const sourceText = d.contentType||"协议";
+        const confirmPerson = d.confirmBy||"—";
+        let extra = d.status==="na"?`｜不适用原因：${d.naReason||""}`:"";
+        reportHtml += `<div class="report-item"><strong>${card.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}${extra}</div>`;
+    });
+
+    document.getElementById("reportContent").innerHTML = reportHtml;
+    document.getElementById("confirmMsg").innerText = `您好，针对本次实习，我方确认以下实习约定，请核对：企业【${formData.companyName}】岗位【${formData.postName}】，请书面确认实习薪资、工时、休息、补贴等全部实习条款。`;
+    document.getElementById("reportArea").classList.remove("report-hidden");
+};
+
+document.getElementById("exportPdfBtn").onclick = function(){
+    window.print();
+};
+
+document.getElementById("saveRecordBtn").onclick = function(){
+    const saveObj = {
+        id:Date.now(),time:new Date().toLocaleString(),
+        companyName:formData.companyName,postName:formData.postName,jobText:formData.jobText,
+        hRule:JSON.parse(JSON.stringify(formData.hRule)),
+        cCard:JSON.parse(JSON.stringify(formData.cCard))
+    };
+    let list = JSON.parse(localStorage.getItem("internRecord")||"[]");
+    list.unshift(saveObj);
+    localStorage.setItem("internRecord",JSON.stringify(list));
+    alert("评估记录已保存，前往工作台查看！");
+    window.location.href="intern.html";
+};
+
+const ocrFile = document.getElementById("ocrFile");
+const ocrBtn = document.getElementById("ocrBtn");
+const ocrTip = document.getElementById("ocrTip");
+ocrBtn.onclick = async function(){
+    const file = ocrFile.files[0];
+    if(!file){ alert("请先选择一张岗位截图图片"); return; }
+    ocrTip.innerText = "识别加载中，请稍候（超时15秒）";
+    try{
+        const worker = await Tesseract.createWorker("chi_sim");
+        const ret = await worker.recognize(file);
+        document.getElementById("jobText").value = ret.data.text;
+        ocrTip.innerText = "识别完成";
+        await worker.terminate();
+    }catch(e){
+        ocrTip.innerText = "识别失败，请手动输入文字";
+    }
+};
 </script>
 </body>
 </html>
