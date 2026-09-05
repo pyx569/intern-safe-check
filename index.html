@@ -316,25 +316,24 @@ const statusMap = {
     na:"不适用"
 };
 
-//分级规则 high=红色高危 warn=黄色提醒
 const riskMeta = [
-    {title:"收费/押金要求",level:"high",tip:"收费类实习存在诈骗风险，正规实习不得向学生收取任何费用",suggest:"拒绝缴纳任何费用，更换实习单位"},
-    {title:"高额提成保底陷阱",level:"high",tip:"薪资完全依靠提成无保底属于高风险模式，谨防口头高薪骗局",suggest:"务必确认书面底薪与薪资构成，拒绝仅口头承诺高薪"},
-    {title:"异地外派风险",level:"high",tip:"无正规办公地点的异地外派存在人身安全隐患",suggest:"核实企业资质、办公地址，谨慎前往异地"},
-    {title:"身份证件扣押",level:"high",tip:"用人单位不允许扣押学生身份证、银行卡原件",suggest:"拒绝上交证件原件，仅可提供复印件并做好签注"},
-    {title:"借贷刷单任务",level:"high",tip:"刷单、垫资转账属于典型电信诈骗模式",suggest:"直接放弃该实习岗位，切勿参与资金操作"},
-    {title:"传销层级计酬",level:"high",tip:"依靠拉人头获取报酬属于传销特征",suggest:"立即放弃该实习，必要时报警"},
-    {title:"空白合同签署",level:"high",tip:"签署空白文件会造成权益完全不受保护",suggest:"拒绝签署任何空白合同与空白文件"},
-    {title:"竞业无限扩大",level:"warn",tip:"宽泛无边界竞业协议会限制后续就业",suggest:"协商修改竞业范围、期限与补偿金条款"},
-    {title:"敏感信息采集",level:"warn",tip:"无合理理由强制采集人脸声纹等隐私存在泄露风险",suggest:"拒绝非必要敏感信息采集要求"},
-    {title:"空白授权文件",level:"high",tip:"空白授权文件会被随意填写损害学生权益",suggest:"绝不签署空白授权类文件"},
-    {title:"不等责协议责任",level:"warn",tip:"只约束学生、不约束企业的高额违约金条款不合理",suggest:"和企业协商修改不对等违约条款"},
-    {title:"无偿加班强制要求",level:"high",tip:"强制无偿加班侵害学生实习权益",suggest:"和HR确认加班补偿方式，留存沟通记录"},
-    {title:"违规高强度夜班",level:"high",tip:"学生/未成年人长期高危夜班存在安全风险",suggest:"拒绝高危夜班岗位"},
-    {title:"单方面变更约定",level:"warn",tip:"企业可单方面修改薪资岗位地点会损害实习权益",suggest:"要求将变更限制写入实习协议"},
-    {title:"变相收费扣款",level:"high",tip:"以罚款、扣费变相收取实习相关费用",suggest:"拒绝各类变相扣费规则"},
-    {title:"外包转嫁用工责任",level:"warn",tip:"签约主体与实际用工不一致，责任容易互相推诿",suggest:"明确实际用工方、签约方各自权责"},
-    {title:"视频采集核验",level:"warn",tip:"强制录制承诺人脸视频存在被滥用风险",suggest:"谨慎录制约束性质的人脸承诺视频"}
+    {title:"收费/押金要求",tip:"收费类实习存在诈骗风险，正规实习不得向学生收取任何费用",suggest:"拒绝缴纳任何费用，更换实习单位"},
+    {title:"高额提成保底陷阱",tip:"薪资完全依靠提成无基础保障，谨防口头高薪骗局",suggest:"务必确认书面底薪与薪资构成，拒绝仅口头承诺高薪"},
+    {title:"异地外派风险",tip:"无正规办公地点的异地外派存在人身安全隐患",suggest:"核实企业资质、办公地址，谨慎前往异地"},
+    {title:"身份证件扣押",tip:"用人单位不允许扣押学生身份证、银行卡原件",suggest:"拒绝上交证件原件，仅可提供复印件并做好签注"},
+    {title:"借贷刷单任务",tip:"刷单、垫资转账属于典型电信诈骗模式",suggest:"直接放弃该实习岗位，切勿参与资金操作"},
+    {title:"传销层级计酬",tip:"依靠拉人头获取报酬属于传销特征",suggest:"立即放弃该实习，必要时报警"},
+    {title:"空白合同签署",tip:"签署空白文件会造成权益完全不受保护",suggest:"拒绝签署任何空白合同与空白文件"},
+    {title:"竞业无限扩大",tip:"宽泛无边界竞业协议会限制后续就业",suggest:"协商修改竞业范围、期限与补偿金条款"},
+    {title:"敏感信息采集",tip:"在未说明必要性、用途、保存期限和保护措施的前提下强制采集隐私信息存在泄露风险",suggest:"拒绝非必要且无书面说明的敏感信息采集要求"},
+    {title:"空白授权文件",tip:"签署空白文件或主动放弃实习报酬、实习证明等法定基本权益，自身权益将不受保障",suggest:"绝不签署空白文件，不放弃书面明确的实习权益"},
+    {title:"不对等协议责任",tip:"协议设置明显不对等的高额违约责任、过度竞业限制、无限期绑定或者企业单方免责条款",suggest:"和企业协商修改权责不对等的违约与约束条款"},
+    {title:"无偿加班强制要求",tip:"强制无偿加班侵害学生实习权益",suggest:"和HR确认加班补偿方式，留存沟通记录"},
+    {title:"违规高强度夜班",tip:"学生/未成年人长期高危夜班存在安全风险",suggest:"拒绝高危夜班岗位"},
+    {title:"隔离核验与紧迫施压",tip:"对方阻止你向家人、学校或官方渠道核实信息，同时催促你立刻付款、提交敏感材料或仓促做决定",suggest:"放缓签约节奏，通过官方渠道核验企业信息，拒绝仓促操作"},
+    {title:"变相收费扣款",tip:"以罚款、扣费变相收取实习相关费用",suggest:"拒绝各类变相扣费规则"},
+    {title:"外包转嫁用工责任",tip:"签约主体与实际用工不一致，责任容易互相推诿",suggest:"明确实际用工方、签约方各自权责"},
+    {title:"疑似深伪身份",tip:"面试身份无法通过企业官方渠道核验，同时出现画面/声音异常，或要求采集和招聘无关的人脸、声纹身份材料",suggest:"通过企业公开官网、官方电话核验招聘人员真实身份"}
 ];
 
 const hRawList = [
@@ -346,15 +345,15 @@ const hRawList = [
     {title:"传销层级计酬",desc:"报酬依靠拉人头发展下线获取收益"},
     {title:"空白合同签署",desc:"签署空白文件，放弃明确薪酬约定"},
     {title:"竞业无限扩大",desc:"协议包含宽泛无边界的竞业限制"},
-    {title:"敏感信息采集",desc:"无合理必要理由强制采集人脸、声纹等隐私敏感数据"},
-    {title:"空白授权文件",desc:"签署空白文件、放弃书面明确的劳动权益"},
-    {title:"不等责协议责任",desc:"协议设置不对等的高额违约责任"},
+    {title:"敏感信息采集",desc:"对方是否在未说明必要性、使用目的、保存期限和保护措施的情况下，强制要求采集人脸、指纹、手持身份证照片等敏感信息？"},
+    {title:"空白文件与放弃权益",desc:"是否要求签署空白文件，或书面放弃已经明确的报酬、实习证明等基本权益？"},
+    {title:"不对等协议责任",desc:"协议是否设置明显不对等的高额违约责任、过度竞业限制、无限期绑定或单方免责条款？"},
     {title:"无偿加班强制要求",desc:"强制无偿加班且无补偿方案"},
     {title:"违规高强度夜班",desc:"安排未成年人或者在校学生长期夜班高危作业"},
-    {title:"单方面变更约定",desc:"企业可以随意变更岗位、薪资、工作地点而学生无权拒绝"},
+    {title:"隔离核验与紧迫施压",desc:"对方是否阻止你向家人、学校或企业官方渠道核验，同时催促你立即付款、提交敏感信息或作出决定？"},
     {title:"变相收费扣款",desc:"通过罚款、扣费变相收取实习相关费用"},
     {title:"外包转嫁用工责任",desc:"实际用工方和签约主体不一致，责任模糊不清"},
-    {title:"视频采集核验",desc:"要求录制承诺视频、人脸视频作为考核或者约束手段"}
+    {title:"疑似深伪身份",desc:"面试对象身份是否无法通过企业官方渠道核验，且存在画面、声音异常，或要求采集与招聘无关的人脸、声音及身份材料？"}
 ];
 
 const cRawList = [
@@ -527,41 +526,51 @@ document.getElementById("saveEdit").onclick = function(){
     renderCCard();
 };
 
-//新的分级计算逻辑
 function calcRiskResult(){
-    let highList = [];
-    let warnList = [];
+    const yesList = [];
     for(let i=0;i<formData.hRule.length;i++){
-        const item = formData.hRule[i];
-        if(item.ans === "y"){
-            if(riskMeta[i].level === "high"){
-                highList.push(riskMeta[i]);
-            }else if(riskMeta[i].level === "warn"){
-                warnList.push(riskMeta[i]);
-            }
+        if(formData.hRule[i].ans === "y"){
+            yesList.push(riskMeta[i]);
         }
     }
-    const allUnknown = formData.hRule.every(i=>i.ans === "u");
-    if(allUnknown){
-        return {level:"yellow",text:"🟡 待核验提示：全部风险项均为不确定，请完成风险核验后再生成报告。"};
-    }
 
-    let text = "";
-    if(highList.length>0){
-        text += "🔴【高危风险】\n";
-        highList.forEach(h=>{
+    const hasUnknown = formData.hRule.some(i=>i.ans === "u");
+    const coreCards = cRawList.filter(item=>item.core);
+    const coreAllConfirmed = coreCards.every(card=>{
+        return formData.cCard[card.key].status === "confirm";
+    });
+    const unconfirmedCore = coreCards.filter(card=>{
+        return formData.cCard[card.key].status !== "confirm";
+    }).map(card=>card.name);
+
+    if(yesList.length > 0){
+        let text = "🔴 发现高风险信号\n\n";
+        text += "以下风险核验项选择为「是」，存在明确高风险，不建议参与本次实习：\n";
+        yesList.forEach(h=>{
             text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
         });
+        return {level:"red", text:text};
     }
-    if(warnList.length>0){
-        text += "\n🟡【潜在风险提醒】\n";
-        warnList.forEach(w=>{
-            text += `——————————\n【风险项】${w.title}\n【风险说明】${w.tip}\n【行动建议】${w.suggest}\n`;
-        });
+
+    if(hasUnknown || !coreAllConfirmed){
+        let text = "🟡 信息不足，暂不能形成低风险结论\n\n";
+        if(hasUnknown){
+            text += "存在部分风险项选择为「不确定」，请进一步核实岗位信息后重新评估。\n";
+        }
+        if(!coreAllConfirmed){
+            text += "以下核心实习约定尚未全部确认，请补充填写并标记为「已确认」：\n";
+            unconfirmedCore.forEach(name=>{
+                text += `· ${name}\n`;
+            });
+        }
+        text += "\n建议：补齐全部实习约定书面凭证，与HR确认后再行评估。";
+        return {level:"yellow", text:text};
     }
-    if(highList.length>0) return {level:"red",text:text};
-    if(warnList.length>0) return {level:"yellow",text};
-    return {level:"green",text:"🟢 基础风险核验通过，建议完善实习约定卡片，留存书面凭证保护自身权益。"};
+
+    return {
+        level:"green",
+        text:"🟢 暂未发现明确高风险信号\n\n全部17项风险核验均为「否」，且10项核心实习约定均已确认。\n建议：留存全部书面实习协议与沟通记录，保障自身实习权益。"
+    };
 }
 
 document.getElementById("calcResultBtn").onclick = function(){
@@ -569,11 +578,6 @@ document.getElementById("calcResultBtn").onclick = function(){
     const post = document.getElementById("postName").value.trim();
     if(!company||!post){
         alert("请先填写企业名称和实习岗位！");
-        return;
-    }
-    const allUnknown = formData.hRule.every(i=>i.ans === "u");
-    if(allUnknown){
-        alert("请至少完成部分风险项核验，不能全部为【不确定】！");
         return;
     }
 
