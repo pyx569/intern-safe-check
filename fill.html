@@ -13,139 +13,113 @@
     font-family:"Microsoft YaHei",sans-serif;
 }
 body{
-    background:#fff;
-    padding:40px 20px;
+    background:#ffffff;
+    padding:30px 20px;
     color:#333;
 }
 .container{
-    max-width:1100px;
+    max-width:1140px;
     margin:0 auto;
+}
+.test-tip{
+    background:#fff7e6;
+    border:1px solid #ffd591;
+    border-radius:8px;
+    padding:14px 18px;
+    margin-bottom:20px;
+    color:#d48806;
 }
 .header-bar{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:30px;
-    gap:12px;
+    margin-bottom:24px;
     flex-wrap:wrap;
+    gap:10px;
 }
 .btn{
-    padding:8px 16px;
+    padding:9px 18px;
     border-radius:6px;
     border:none;
     cursor:pointer;
     font-size:14px;
 }
-.btn-primary{
-    background:#1677ff;
-    color:#fff;
-}
-.btn-warning{
-    background:#faad14;
-    color:#fff;
-}
-.btn-danger{
-    background:#ff4d4f;
-    color:#fff;
-}
-.btn-success{
-    background:#52c41a;
-    color:#fff;
-}
+.btn-primary{background:#1677ff;color:#fff;}
+.btn-success{background:#52c41a;color:#fff;}
+.btn-warning{background:#faad14;color:#fff;}
 .section{
-    margin-bottom:32px;
-    border:1px solid #eee;
+    border:1px solid #e8e8e8;
     border-radius:10px;
-    padding:24px;
+    padding:22px;
+    margin-bottom:24px;
 }
 .section-title{
     font-size:18px;
     font-weight:bold;
     margin-bottom:16px;
 }
-textarea,input{
+textarea,input,select{
     width:100%;
     border:1px solid #d9d9d9;
     border-radius:6px;
     padding:10px;
     font-size:14px;
 }
-.result-block{
-    padding:20px;
-    border-radius:8px;
-    margin:20px 0;
-    white-space:pre-line;
-    line-height:1.8;
-}
-.red{
-    background:#fff1f0;
-    border:1px solid #ffa39e;
-}
-.yellow{
-    background:#fffbe6;
-    border:1px solid #ffe58f;
-}
-.green{
-    background:#f6ffed;
-    border:1px solid #b7eb8f;
-}
-.report-hidden{
-    display:none;
-}
-.report-item{
-    padding:8px 0;
-    border-bottom:1px solid #efefef;
-    line-height:1.7;
-}
+textarea{min-height:80px;resize:vertical;}
 .question-row{
     padding:12px 0;
     border-bottom:1px solid #eee;
 }
 .opt-group{
-    display:flex;
-    gap:16px;
-    margin-top:8px;
+    display:flex;gap:18px;margin-top:8px;
 }
+.result-block{
+    padding:20px;border-radius:8px;margin:16px 0;white-space:pre-line;line-height:1.8;
+}
+.red{background:#fff1f0;border:1px solid #ffa39e;}
+.orange{background:#fff7e6;border:1px solid #ffd591;}
+.green{background:#f6ffed;border:1px solid #b7eb8f;}
+.report-hidden{display:none;}
+.report-item{padding:8px 0;border-bottom:1px solid #efefef;line-height:1.7;}
 .no-print{}
 @media print{
-    .no-print{
-        display:none !important;
-    }
-    body{
-        padding:0;
-        background:#fff;
-    }
+    .no-print{display:none !important;}
+    body{padding:0;background:#fff;}
 }
 </style>
 </head>
 <body>
 <div class="container">
+    <!-- 测试提示 -->
+    <div class="test-tip no-print">
+        ⚠️该项目正在测试中，不建议正式使用，评估结果仅供参考
+    </div>
+
     <div class="header-bar no-print">
         <h1>实习有约｜简易风险速评</h1>
         <div>
-            <a href="index.html"><button class="btn">完整评估</button></a>
-            <a href="intern.html"><button class="btn">我的工作台</button></a>
+            <a href=" "><button class="btn">完整评估</button></a >
+            <a href="intern.html"><button class="btn">我的工作台</button></a >
         </div>
     </div>
 
     <div class="section no-print">
         <div class="section-title">第一步：粘贴岗位描述 / 上传截图识别文字</div>
-        <textarea id="jobText" rows="6" placeholder="粘贴岗位招聘文案，也可以上传图片自动提取文字"></textarea>
+        <textarea id="jobText" rows="6" placeholder="粘贴招聘文案，也可以上传图片自动提取文字"></textarea>
         <div style="margin:12px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
             <input type="file" id="ocrFile" accept="image/*">
             <button class="btn btn-warning" id="ocrBtn">识图提取文字</button>
-            <button class="btn btn-primary" id="autoFillRuleBtn">一键智能预判风险（可手动修改）</button>
             <span id="ocrTip"></span>
         </div>
     </div>
 
     <div class="section no-print">
-        <div class="section-title">第二步：风险核验问卷（H01‑H17）</div>
+        <div class="section-title">第二步：风险核验问卷（手动选择）</div>
         <div id="questionWrap"></div>
     </div>
 
     <div class="section no-print">
-        <button class="btn btn-primary" id="buildReportBtn">生成简易风险报告</button>
+        <button class="btn btn-success" id="buildReportBtn">生成简易风险报告</button>
     </div>
 
     <div id="resultWrap" class="no-print"></div>
@@ -175,7 +149,7 @@ const riskMeta = [
     {title:"空白合同签署",tip:"签署空白文件会造成权益完全不受保护",suggest:"拒绝签署任何空白合同与空白文件"},
     {title:"竞业无限扩大",tip:"宽泛无边界竞业协议会限制后续就业",suggest:"协商修改竞业范围、期限与补偿金条款"},
     {title:"敏感信息采集",tip:"在未说明必要性、用途、保存期限和保护措施的前提下强制采集隐私信息存在泄露风险",suggest:"拒绝非必要且无书面说明的敏感信息采集要求"},
-    {title:"空白文件与放弃权益",tip:"签署空白文件或主动放弃实习报酬、实习证明等法定基本权益，自身权益将不受保障",suggest:"绝不签署空白文件，不放弃书面明确的实习权益"},
+    {title:"空白文件与放弃权益",tip:"签署空白文件或主动放弃实习报酬、实习证明等法定基本权益，自身权益将不受保护",suggest:"绝不签署空白文件，不放弃书面明确的实习权益"},
     {title:"不对等协议责任",tip:"协议设置明显不对等的高额违约责任、过度竞业限制、无限期绑定或者企业单方免责条款",suggest:"和企业协商修改权责不对等的违约与约束条款"},
     {title:"无偿加班强制要求",tip:"强制无偿加班侵害学生实习权益",suggest:"和HR确认加班补偿方式，留存沟通记录"},
     {title:"违规高强度夜班",tip:"学生/未成年人长期高危夜班存在安全风险",suggest:"拒绝高危夜班岗位"},
@@ -185,25 +159,9 @@ const riskMeta = [
     {title:"疑似深伪身份",tip:"面试身份无法通过企业官方渠道核验，同时出现画面/声音异常，或要求采集和招聘无关的人脸、声纹身份材料",suggest:"通过企业公开官网、官方电话核验招聘人员真实身份"}
 ];
 
-const hRawList = [
-    {title:"收费/押金要求",desc:"企业是否要求缴纳押金、保证金、培训费、服装费等费用",keywords:["押金","保证金","培训费","服装费","建档费"]},
-    {title:"高额提成保底陷阱",desc:"薪资完全依靠提成，无基础保障，存在口头高薪承诺",keywords:["提成","无责底薪0","高薪诱惑"]},
-    {title:"异地外派风险",desc:"要求前往外地培训、上岗，不提供正规办公地址",keywords:["外地培训","异地","外派","边境"]},
-    {title:"身份证件扣押",desc:"要求上交身份证、银行卡原件或者索要验证码",keywords:["扣押身份证","上交银行卡","验证码"]},
-    {title:"借贷刷单任务",desc:"工作内容包含刷单、转账垫资、贷款操作",keywords:["刷单","垫付","转账","充值解冻"]},
-    {title:"传销层级计酬",desc:"报酬依靠拉人头发展下线获取收益",keywords:["拉人头","下线","层级提成"]},
-    {title:"空白合同签署",desc:"签署空白文件，放弃明确薪酬约定",keywords:["空白合同","空白协议"]},
-    {title:"竞业无限扩大",desc:"协议包含宽泛无边界的竞业限制",keywords:["竞业","终身限制"]},
-    {title:"敏感信息采集",desc:"对方是否在未说明必要性、使用目的、保存期限和保护措施的情况下，强制要求采集人脸、指纹、手持身份证照片等敏感信息？",keywords:["人脸","指纹","手持身份证"]},
-    {title:"空白文件与放弃权益",desc:"是否要求签署空白文件，或书面放弃已经明确的报酬、实习证明等基本权益？",keywords:["放弃报酬","放弃证明","空白文件"]},
-    {title:"不对等协议责任",desc:"协议是否设置明显不对等的高额违约责任、过度竞业限制、无限期绑定或单方免责条款？",keywords:["高额违约金","单方免责"]},
-    {title:"无偿加班强制要求",desc:"强制无偿加班且无补偿方案",keywords:["无偿加班","无加班费"]},
-    {title:"违规高强度夜班",desc:"安排未成年人或者在校学生长期夜班高危作业",keywords:["夜班","通宵值班"]},
-    {title:"隔离核验与紧迫施压",desc:"对方是否阻止你向家人、学校或企业官方渠道核验，同时催促你立即付款、提交敏感信息或作出决定？",keywords:["尽快决定","抓紧交钱","不要告诉别人"]},
-    {title:"变相收费扣款",desc:"通过罚款、扣费变相收取实习相关费用",keywords:["罚款","扣费","违约金抵扣"]},
-    {title:"外包转嫁用工责任",desc:"实际用工方和签约主体不一致，责任模糊不清",keywords:["外包","第三方签约"]},
-    {title:"疑似深伪身份",desc:"面试对象身份是否无法通过企业官方渠道核验，且存在画面、声音异常，或要求采集与招聘无关的人脸、声音及身份材料？",keywords:["视频换脸","语音验证"]}
-];
+const hRawList = riskMeta.map((item)=>{
+    return {title:item.title, desc:item.tip};
+});
 
 let formData = {
     jobText:"",
@@ -220,41 +178,26 @@ function resetAllData(){
 function renderQuestion(){
     const wrap = document.getElementById("questionWrap");
     wrap.innerHTML = "";
-    hRawList.forEach((item,idx)=>{
+    hRawList.forEach((item)=>{
         const row = document.createElement("div");
         row.className = "question-row";
         row.innerHTML = `
-            <div><strong>H${String(idx+1).padStart(2,'0')} ${item.title}</strong></div>
+            <div><strong>${item.title}</strong></div>
             <div style="font-size:13px;color:#666;margin:4px 0 8px;">${item.desc}</div>
             <div class="opt-group">
-                <label><input type="radio" name="h${idx}" value="y"> 是</label>
-                <label><input type="radio" name="h${idx}" value="n"> 否</label>
-                <label><input type="radio" name="h${idx}" value="u" checked> 不确定</label>
+                <label><input type="radio" name="h_${item.title}" value="y"> 是</label>
+                <label><input type="radio" name="h_${item.title}" value="n"> 否</label>
+                <label><input type="radio" name="h_${item.title}" value="u" checked> 不确定</label>
             </div>
         `;
         wrap.appendChild(row);
     });
 }
 
-document.getElementById("autoFillRuleBtn").onclick = function(){
-    const text = document.getElementById("jobText").value.toLowerCase();
-    if(!text.trim()){
-        alert("请先粘贴岗位描述文字！");
-        return;
-    }
-    hRawList.forEach((item,idx)=>{
-        const hit = item.keywords.some(word=>text.includes(word));
-        const val = hit ? "y":"u";
-        const radio = document.querySelector(`input[name="h${idx}"][value="${val}"]`);
-        if(radio) radio.checked = true;
-    });
-    alert("自动预判完成！你可以手动修改每一题的选项");
-};
-
 function readQuestionValue(){
-    hRawList.forEach((_,idx)=>{
-        const sel = document.querySelector(`input[name="h${idx}"]:checked`);
-        formData.hRule[idx].ans = sel ? sel.value : "u";
+    hRawList.forEach((item)=>{
+        const sel = document.querySelector(`input[name="h_${item.title}"]:checked`);
+        item.ans = sel ? sel.value : "u";
     });
 }
 
@@ -264,32 +207,33 @@ function calcRiskResult(){
     const unsureList = [];
     for(let i=0;i<formData.hRule.length;i++){
         if(formData.hRule[i].ans === "y") yesList.push(riskMeta[i]);
-        if(formData.hRule[i].ans === "u") unsureList.push(hRawList[i]);
+        if(formData.hRule[i].ans === "u") unsureList.push(hRawList[i].title);
+    }
+    const allUnknown = formData.hRule.every(i=>i.ans === "u");
+    if(allUnknown){
+        return {level:"orange",text:"🟡 待核验提示：全部风险项均为不确定，请完成风险核验后再生成报告。"};
     }
 
-    if(yesList.length > 0){
-        let text = "🔴 发现高风险信号\n\n";
-        text += "以下风险核验项选择【是】，存在明确高风险，不建议参与本次实习：\n";
+    let text = "";
+    if(yesList.length>0){
+        text += "🔴【高危风险】\n";
         yesList.forEach(h=>{
             text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
         });
-        return {level:"red",text};
     }
-
-    if(unsureList.length > 0){
-        let text = "🟡 信息不足，暂不能形成低风险结论\n\n";
-        text += "存在部分风险项结果为「不确定」，建议进一步向企业核实信息。";
-        return {level:"yellow",text};
+    if(unsureList.length>0){
+        text += "\n🟡【潜在风险提醒】\n";
+        unsureList.forEach(w=>{
+            text += `· ${w}：结果为不确定，建议进一步核实\n`;
+        });
     }
-
-    return {
-        level:"green",
-        text:"🟢 暂未发现明确高风险信号\n\n全部风险项均选择【否】，可初步判定风险较低。如需完整核验，请前往完整版评估页面补充实习约定信息。"
-    };
+    if(yesList.length>0) return {level:"red",text:text};
+    if(unsureList.length>0) return {level:"yellow",text};
+    return {level:"green",text:"🟢 基础风险核验通过，简易版不包含实习约定卡片核验，如需完整评估请切换至完整评估页面。"};
 }
 
-function generateReport(){
-    formData.jobText = document.getElementById("jobText").value;
+document.getElementById("buildReportBtn").onclick = function(){
+    formData.jobText = document.getElementById("jobText").value.trim();
     const res = calcRiskResult();
     const wrap = document.getElementById("resultWrap");
     wrap.innerHTML = `<div class="result-block ${res.level}">${res.text}</div>`;
@@ -297,14 +241,11 @@ function generateReport(){
     let reportHtml = "<h4>风险核验详情</h4>";
     formData.hRule.forEach((item,i)=>{
         const ansText = item.ans==="y"?"是":item.ans==="n"?"否":"不确定";
-        reportHtml += `<div class="report-item"><strong>H${String(i+1).padStart(2,'0')} ${item.title}</strong>｜判定结果：${ansText}</div>`;
+        reportHtml += `<div class="report-item"><strong>${item.title}</strong>｜判定结果：${ansText}</div>`;
     });
-
     document.getElementById("reportContent").innerHTML = reportHtml;
     document.getElementById("reportArea").classList.remove("report-hidden");
-}
-
-document.getElementById("buildReportBtn").onclick = generateReport;
+};
 
 document.getElementById("exportPdfBtn").onclick = ()=>window.print();
 
@@ -313,10 +254,7 @@ const ocrBtn = document.getElementById("ocrBtn");
 const ocrTip = document.getElementById("ocrTip");
 ocrBtn.onclick = async function(){
     const file = ocrFile.files[0];
-    if(!file){
-        alert("请先选择一张岗位截图图片");
-        return;
-    }
+    if(!file){ alert("请先选择一张岗位截图图片"); return; }
     ocrTip.innerText = "识别加载中，请稍候（超时15秒）";
     try{
         const worker = await Tesseract.createWorker("chi_sim");
