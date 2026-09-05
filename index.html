@@ -143,7 +143,6 @@ textarea{min-height:80px;resize:vertical;}
             <label>公司名称</label>
             <input id="companyName" placeholder="请填写实习所属公司全称">
         </div>
-        <!-- 新增：跳转国家企业信用信息公示系统按钮，新窗口打开 -->
         <div style="margin-bottom:14px;">
             <a href="https://www.gsxt.gov.cn/" target="_blank">
                 <button class="btn btn-info">🔗 前往国家企业信用信息公示系统核验企业</button>
@@ -153,7 +152,7 @@ textarea{min-height:80px;resize:vertical;}
 
         <div style="margin-bottom:14px;">
             <label>实习岗位名称</label>
-            <input id="jobName" placeholder="请填写具体实习岗位">
+            <input id="postName" placeholder="请填写具体实习岗位">
         </div>
         <div style="margin-bottom:14px;">
             <label>岗位描述（可粘贴文本或上传图片识别）</label>
@@ -187,6 +186,7 @@ textarea{min-height:80px;resize:vertical;}
     </div>
 
     <div id="resultWrap" class="no-print"></div>
+
     <div id="reportArea" class="report-hidden">
         <div class="section">
             <div class="section-title">📄完整实习风险评估报告</div>
@@ -428,7 +428,7 @@ function openEditModal(key){
         }
         if(st === "na"){
             if(!cfg.disableNa && !naReasonVal){
-                alert("选择【不适用】，必须填写不适用原因！");
+                alert("选择【不适用】，必须填写不适用的原因！");
                 return;
             }
         }
@@ -486,7 +486,7 @@ function calcRiskResult(){
 
 function generateReport(){
     formData.companyName = document.getElementById("companyName").value.trim();
-    formData.postName = document.getElementById("jobName").value.trim();
+    formData.postName = document.getElementById("postName").value.trim();
     formData.jobText = document.getElementById("jobText").value.trim();
 
     if(!formData.companyName){alert("请填写公司名称！");return;}
@@ -559,7 +559,40 @@ ocrBtn.onclick = async function(){
     }
 };
 
-resetAllData();
+// 通过url参数 loadId 读取本地存储的历史评估记录
+function tryLoadByUrlId(){
+    const params = new URLSearchParams(location.search);
+    const loadId = params.get("loadId");
+    if(!loadId) return false;
+
+    const raw = localStorage.getItem("internRecord");
+    if(!raw) return false;
+    const list = JSON.parse(raw);
+    const target = list.find(r=> String(r.id) === String(loadId));
+    if(!target) return false;
+
+    //回填表单数据
+    formData.companyName = target.companyName||"";
+    formData.postName = target.postName||"";
+    formData.jobText = target.jobText||"";
+    formData.hRule = JSON.parse(JSON.stringify(target.hRule));
+    formData.cCard = JSON.parse(JSON.stringify(target.cCard));
+
+    document.getElementById("companyName").value = formData.companyName;
+    document.getElementById("postName").value = formData.postName;
+    document.getElementById("jobText").value = formData.jobText;
+
+    renderQuestion();
+    renderCCard();
+    return true;
+}
+
+window.addEventListener('load',function(){
+    const loaded = tryLoadByUrlId();
+    if(!loaded){
+        resetAllData();
+    }
+});
 </script>
 </body>
 </html>
