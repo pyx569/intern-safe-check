@@ -452,31 +452,36 @@ function readQuestionValue(){
     });
 }
 
-// ===== 修改后的风险判断逻辑：只看H问卷 =====
 function calcRiskResult(){
     readQuestionValue();
     const yesList = [];
     const unsureList = [];
     for(let i=0;i<formData.hRule.length;i++){
-        if(formData.hRule[i].ans === "y") yesList.push(riskMeta[i]);
-        if(formData.hRule[i].ans === "u") unsureList.push(hRawList[i].title);
+        if(formData.hRule[i].ans === "y"){
+            yesList.push(riskMeta[i]);
+        }
+        if(formData.hRule[i].ans === "u"){
+            unsureList.push(riskMeta[i]);
+        }
     }
 
-    // 只要有任意一项选【是】→红色高危
+    // 1.任意是 →红色，全部列出风险
     if(yesList.length > 0){
-        let text = "🔴 发现高风险信号\n\n";
-        text += "以下风险核验项选择【是】，存在明确高风险，不建议参与本次实习：\n";
+        let text = "🔴 发现高风险信号，存在以下高风险项，不建议参与本次实习：\n";
         yesList.forEach(h=>{
             text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
         });
         return {level:"red", text};
     }
-    // 没有是，但存在不确定 → 黄色
+    // 2.没有是，但有不确定 →黄色，全部列出不确定项
     if(unsureList.length > 0){
-        let text = "🟡 信息待核验\n\n存在部分风险项结果为「不确定」，建议进一步向企业核实相关信息。";
+        let text = "🟡 信息待核验，存在以下需要进一步核实的风险项：\n";
+        unsureList.forEach(u=>{
+            text += `——————————\n【待核验项】${u.title}\n【说明】${u.tip}\n【建议】${u.suggest}\n`;
+        });
         return {level:"orange",text};
     }
-    // 全部选否 →绿色
+    //3.全部否，绿色
     return {level:"green",text:"🟢 暂未发现明确高风险信号\n\n全部风险项均选择【否】。建议完善实习约定卡片，留存书面凭证保护自身权益。"};
 }
 
@@ -567,7 +572,6 @@ function tryLoadByUrlId(){
     const target = list.find(r=> String(r.id) === String(loadId));
     if(!target) return false;
 
-    //回填表单数据
     formData.companyName = target.companyName||"";
     formData.postName = target.postName||"";
     formData.jobText = target.jobText||"";
