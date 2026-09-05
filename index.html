@@ -91,7 +91,7 @@ textarea{min-height:80px;resize:vertical;}
 .card-status{
     font-size:13px;font-weight:500;
 }
-.status-clear{color:#444;}
+.status-clear{color:#fa8c16;}
 .status-pending{color:#fa8c16;}
 .status-confirm{color:#52c41a;}
 .status-na{color:#8c8c8c;}
@@ -258,6 +258,9 @@ const cRawList = [
     {key:"C19",name:"加班与调休规则",tip:"填写加班补贴、调休规则、申请审批流程",disableNa:false},
     {key:"C20",name:"知识产权归属",tip:"填写实习创作作品版权归属、个人作品集使用权限",disableNa:false}
 ];
+
+// 定义必须完整填写才允许绿色通过的核心卡片：C01‑C10
+const coreCheckKeys = ["C01","C02","C03","C04","C05","C06","C07","C08","C09","C10"];
 
 let currentEditKey = "";
 let expandOpened = false;
@@ -456,12 +459,23 @@ function calcRiskResult(){
     readQuestionValue();
     const yesList = [];
     const unsureList = [];
+    let hasEmptyCoreCard = false;
+
     for(let i=0;i<riskMeta.length;i++){
         const ans = hRawList[i].ans;
         if(ans === "y") yesList.push(riskMeta[i]);
         if(ans === "u") unsureList.push(riskMeta[i]);
     }
 
+    // 仅校验C01‑C10是否存在待填写
+    coreCheckKeys.forEach(key=>{
+        const cardData = formData.cCard[key];
+        if(cardData.status === "clear"){
+            hasEmptyCoreCard = true;
+        }
+    })
+
+    // 1. 高危优先：任意H=是
     if(yesList.length > 0){
         let text = "🔴 高危风险\n\n";
         text += "以下风险核验项选择【是】，存在明确高风险，不建议参与本次实习：\n";
@@ -470,6 +484,15 @@ function calcRiskResult(){
         });
         return {level:"red", text};
     }
+
+    // 2. H全部否，但C01‑C10有空缺 → 黄色待完善
+    if(unsureList.length === 0 && hasEmptyCoreCard){
+        let text = "🟡 信息待核验\n\n";
+        text += "风险问卷全部无异常，但实习核心约定信息（C01‑C10）尚未完整填写。\n请补全用人主体、岗位、薪资、工时等核心协议内容，留存书面凭证保障自身实习权益。";
+        return {level:"orange",text};
+    }
+
+    //3.存在不确定项
     if(unsureList.length > 0){
         let text = "🟡 信息待核验\n\n";
         text += "以下风险核验项选择【不确定】，建议进一步向企业核实：\n";
@@ -478,7 +501,12 @@ function calcRiskResult(){
         });
         return {level:"orange",text};
     }
-    return {level:"green",text:"🟢 暂未发现明确高风险信号\n\n全部风险项均选择【否】。建议完善实习约定卡片，留存书面凭证保护自身权益。"};
+
+    //4.全部正常：H全否，C01‑C10全部确认；C11‑C20不影响绿色判定
+    return {
+        level:"green",
+        text:"🟢 暂未发现明确高风险信号\n\n风险问卷全部为否，实习核心约定信息（C01‑C10）填写完整。本次实习风险可控，可正常参与实习。"
+    };
 }
 
 function generateReport(){
@@ -512,7 +540,7 @@ function generateReport(){
         const showContent = d.content||"无";
         const sourceText = d.contentType||"协议";
         const confirmPerson = d.confirmBy||"—";
-        let extra = d.status==="na"?`｜不适用原因：${d.naReason||""}`:"";
+        const extra = d.status==="na"?`｜不适用原因：${d.naReason||""}`:"";
         reportHtml += `<div class="report-item"><strong>${cfg.name}</strong>｜状态：${statusText}｜内容：${showContent}｜来源：${sourceText}｜确认人：${confirmPerson}${extra}</div>`;
     });
     document.getElementById("reportContent").innerHTML = reportHtml;
