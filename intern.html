@@ -118,10 +118,12 @@ function renderReport(){
 }
 renderReport();
 
+// 使用URL参数传递记录id，支持新开标签页
 function loadReport(idx){
-    sessionStorage.setItem("loadRecordData", JSON.stringify(reportList[idx]));
-    window.location.href = "index.html";
+    const rec = reportList[idx];
+    window.location.href = "index.html?loadId="+rec.id;
 }
+
 function delReport(idx){
     if(!confirm("确定删除这条评估记录吗？"))return;
     reportList.splice(idx,1);
