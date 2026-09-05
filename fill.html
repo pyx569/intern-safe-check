@@ -201,44 +201,72 @@ function readQuestionValue(){
     });
 }
 
-//简易版同样更新判断逻辑
 function calcRiskResult(){
     readQuestionValue();
+
     const yesList = [];
     const unsureList = [];
-    for(let i=0;i<formData.hRule.length;i++){
-        if(formData.hRule[i].ans === "y") yesList.push(riskMeta[i]);
-        if(formData.hRule[i].ans === "u") unsureList.push(hRawList[i].title);
+
+    for(let i = 0; i < formData.hRule.length; i++){
+        if(formData.hRule[i].ans === "y"){
+            yesList.push(riskMeta[i]);
+        }
+        if(formData.hRule[i].ans === "u"){
+            unsureList.push(riskMeta[i]);
+        }
     }
 
-    if(yesList.length>0){
-        let text = "🔴【高危风险】\n";
+    // 第一优先级：只要有任意一项选“是”，直接红色风险
+    if(yesList.length > 0){
+        let text = "🔴 高危风险\n\n";
+        text += "以下风险核验项选择【是】，存在明确高风险，不建议参与本次实习：\n";
+
         yesList.forEach(h=>{
-            text += `——————————\n【风险项】${h.title}\n【风险说明】${h.tip}\n【行动建议】${h.suggest}\n`;
+            text += `\n——————————\n`;
+            text += `【风险项】${h.title}\n`;
+            text += `【风险说明】${h.tip}\n`;
+            text += `【行动建议】${h.suggest}\n`;
         });
-        return {level:"red",text:text};
+
+        return {level:"red", text};
     }
-    if(unsureList.length>0){
-        let text = "🟡【潜在风险提醒】\n";
-        unsureList.forEach(w=>{
-            text += `· ${w}：结果为不确定，建议进一步核实\n`;
+
+    // 第二优先级：没有“是”，但有“不确定”，黄色风险
+    if(unsureList.length > 0){
+        let text = "🟡 信息待核验\n\n";
+        text += "以下风险核验项选择【不确定】，建议进一步向企业核实：\n";
+
+        unsureList.forEach(u=>{
+            text += `\n——————————\n`;
+            text += `【待核验项】${u.title}\n`;
+            text += `【说明】${u.tip}\n`;
+            text += `【建议】${u.suggest}\n`;
         });
-        return {level:"yellow",text};
+
+        return {level:"orange", text};
     }
-    return {level:"green",text:"🟢 基础风险核验通过，简易版不包含实习约定卡片核验，如需完整评估请切换至完整评估页面。"};
+
+    // 第三优先级：全部选“否”，绿色通过
+    return {
+        level:"green",
+        text:"🟢 暂未发现明确高风险信号\n\n全部风险项均选择【否】。建议完善实习约定信息，留存书面凭证保护自身权益。"
+    };
 }
 
 document.getElementById("buildReportBtn").onclick = function(){
     formData.jobText = document.getElementById("jobText").value.trim();
+
     const res = calcRiskResult();
     const wrap = document.getElementById("resultWrap");
     wrap.innerHTML = `<div class="result-block ${res.level}">${res.text}</div>`;
 
     let reportHtml = "<h4>风险核验详情</h4>";
-    formData.hRule.forEach((item,i)=>{
-        const ansText = item.ans==="y"?"是":item.ans==="n"?"否":"不确定";
+
+    formData.hRule.forEach((item)=>{
+        const ansText = item.ans === "y" ? "是" : item.ans === "n" ? "否" : "不确定";
         reportHtml += `<div class="report-item"><strong>${item.title}</strong>｜判定结果：${ansText}</div>`;
     });
+
     document.getElementById("reportContent").innerHTML = reportHtml;
     document.getElementById("reportArea").classList.remove("report-hidden");
 };
@@ -248,10 +276,16 @@ document.getElementById("exportPdfBtn").onclick = ()=>window.print();
 const ocrFile = document.getElementById("ocrFile");
 const ocrBtn = document.getElementById("ocrBtn");
 const ocrTip = document.getElementById("ocrTip");
+
 ocrBtn.onclick = async function(){
     const file = ocrFile.files[0];
-    if(!file){ alert("请先选择一张岗位截图图片"); return; }
+    if(!file){
+        alert("请先选择一张岗位截图图片");
+        return;
+    }
+
     ocrTip.innerText = "识别加载中，请稍候（超时15秒）";
+
     try{
         const worker = await Tesseract.createWorker("chi_sim");
         const ret = await worker.recognize(file);
